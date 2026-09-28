@@ -102,8 +102,8 @@ a{color:var(--g7)}
 .btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:10px}
 .btn.block{width:100%}
 .btn svg{width:17px;height:17px}
-label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--ink-2)}
-label.f small{font-weight:500;color:var(--muted)}
+label.f,div.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--ink-2)}
+label.f small,div.f small{font-weight:500;color:var(--muted)}
 .in{width:100%;min-height:44px;border:1px solid var(--line-2);border-radius:11px;background:#fff;padding:9px 12px;outline:none;transition:border-color .12s,box-shadow .12s}
 .in:focus{border-color:var(--g5);box-shadow:0 0 0 3px var(--g1)}
 textarea.in{min-height:84px;resize:vertical}
@@ -247,6 +247,8 @@ table.t{width:100%;border-collapse:collapse;font-size:14px}
 .upload:hover{border-color:var(--g5)}
 .upload input{position:absolute;opacity:0;width:1px;height:1px}
 .upload img{max-height:180px;border-radius:10px}
+.upload.upload-sm{padding:12px;border-width:1.5px;gap:4px;position:relative}
+.upload.upload-sm svg{width:18px;height:18px}
 .total-box{background:var(--g9);color:#fff;border-radius:16px;padding:18px}
 .total-box .kv dt{color:var(--g2)} .total-box .kv dd{color:#fff}
 .total-box .big{font-family:var(--display);font-size:30px}
@@ -392,6 +394,56 @@ function downloadCSV(filename, rows) {
   const csv = "﻿" + rows.map((r) => r.map((v) => { const s = String(v ?? ""); return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s; }).join(",")).join("\r\n");
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
+// ---------------------------------------------------------------- receipts (optional attachments, private "receipts" bucket)
+const RECEIPT_FOLDER = { purchase: "purchases", expense: "expenses", refund: "refunds", payout: "payouts" };
+const receiptField = (label = "Receipt (optional)") => (`<div class="f">${label}<label class="upload upload-sm" data-receipt-pick><span class="row" style="gap:8px;justify-content:center">${ic("upload")}<b data-rl>Attach photo or PDF</b></span><small class="muted">JPG, PNG or PDF · up to 10 MB</small><input type="file" name="receipt" accept="image/*,application/pdf"></label></div>`);
+async function uploadReceipt(kind, file) {
+  if (!file || !file.size) return null;
+  if (file.size > 10 * 1024 * 1024) fail("That receipt is over 10 MB. Please attach a smaller photo or PDF.");
+  if (!/^image\/|application\/pdf/.test(file.type || "") && !/\.(jpe?g|png|webp|heic|pdf)$/i.test(file.name)) fail("Receipts must be a photo (JPG, PNG) or a PDF.");
+  const ext = ((file.name.match(/\.([A-Za-z0-9]{2,5})$/) || [])[1] || (file.type === "application/pdf" ? "pdf" : "jpg")).toLowerCase();
+  const path = `${RECEIPT_FOLDER[kind]}/${PUB.today.slice(0, 7)}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await sb.storage.from("receipts").upload(path, file, { contentType: file.type || "application/octet-stream", upsert: false });
+  if (error) throw error;
+  return path;
+}
+const receiptBtn = (path) => path ? `<button type="button" class="btn ghost sm" data-receipt="${esc(path)}">${ic("receipt")} Receipt</button>` : "";
+const attachBtn = (kind, id) => `<button type="button" class="btn ghost sm" data-attach="${kind}" data-id="${esc(id)}">${ic("upload")} Add receipt</button>`;
+const receiptCell = (kind, id, path, canAttach) => path ? receiptBtn(path) : canAttach ? attachBtn(kind, id) : "";
+async function showReceipt(el) {
+  const path = el.dataset.receipt;
+  const url = await run(async () => { const { data, error } = await sb.storage.from("receipts").createSignedUrl(path, 600); if (error) throw error; return data.signedUrl; });
+  if (!url) return;
+  const view = /\.pdf$/i.test(path)
+    ? `<iframe src="${esc(url)}" title="Receipt" style="width:100%;height:480px;border:1px solid var(--line);border-radius:12px"></iframe>`
+    : `<img src="${esc(url)}" alt="Receipt" style="width:100%;border:1px solid var(--line);border-radius:12px;display:block">`;
+  const link = `<a href="${esc(url)}" target="_blank" rel="noopener" class="muted" style="font-size:13px">Open full size</a>`;
+  if (MODAL) { // inside an open window (e.g. a booking): show it right under the button
+    const box = el.nextElementSibling?.classList.contains("proof-view") ? el.nextElementSibling : null;
+    if (box) return box.remove();
+    el.insertAdjacentHTML("afterend", `<div class="proof-view">${view}${link}</div>`);
+  } else openModal({ render: () => `${mhead("Receipt")}<div class="stack">${view}${link}</div>` });
+}
+function attachLater(el) {
+  const input = document.createElement("input"); input.type = "file"; input.accept = "image/*,application/pdf";
+  input.addEventListener("change", async () => {
+    const file = input.files[0]; if (!file) return;
+    el.disabled = true;
+    const ok = await run(async () => { const path = await uploadReceipt(el.dataset.attach, file); await rpc("attach_receipt", { p_kind: el.dataset.attach, p_id: el.dataset.id, p_path: path }); }, "Receipt attached.");
+    el.disabled = false;
+    if (ok) { if (MODAL && typeof Staff !== "undefined" && Staff.drawer?.b) await Staff.reloadBooking(); else render(); }
+  });
+  input.click();
+}
+document.addEventListener("click", (e) => {
+  const r = e.target.closest("[data-receipt]"); if (r) { e.preventDefault(); showReceipt(r); return; }
+  const a = e.target.closest("[data-attach]"); if (a) { e.preventDefault(); attachLater(a); }
+});
+document.addEventListener("change", (e) => {
+  const t = e.target; if (!(t instanceof HTMLInputElement) || t.name !== "receipt" || t.type !== "file") return;
+  const lab = t.closest("[data-receipt-pick]")?.querySelector("[data-rl]"); if (lab) lab.textContent = t.files[0] ? t.files[0].name : "Attach photo or PDF";
+});
+
 function copyText(t) { navigator.clipboard?.writeText(t).then(() => toast("Copied."), () => toast("Couldn't copy — select the text instead.", true)); }
 
 // ---------------------------------------------------------------- modal
@@ -862,7 +914,7 @@ const Staff = {
         ${field("Reason", `<textarea class="in" name="reason" required placeholder="e.g. Customer called — rain"></textarea>`)}
         <div class="row"><button class="btn bad">Cancel & release the court</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     }
-    if (m === "refund") action = `<form class="card stack" data-f="refund"><h3>Record refund paid out</h3>${field("Amount", money("amount", b.refund_due || "", `max="${b.amount_paid}"`))}${field("Paid via", sel("method", methods.filter((x) => x.is_active).map((x) => [x.id, x.name])))}${field("Reference no.", inp("refno", ""))}<div class="row"><button class="btn">Record refund</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
+    if (m === "refund") action = `<form class="card stack" data-f="refund"><h3>Record refund paid out</h3>${field("Amount", money("amount", b.refund_due || "", `max="${b.amount_paid}"`))}${field("Paid via", sel("method", methods.filter((x) => x.is_active).map((x) => [x.id, x.name])))}${field("Reference no.", inp("refno", ""))}${receiptField("Transfer receipt (optional)")}<div class="row"><button class="btn">Record refund</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     if (m === "extend") action = `<form class="card stack" data-f="extend"><h3>Give more time to pay</h3>${field("Add", suffix("hours", 4, "hours", 'min="1" max="168"'))}<div class="row"><button class="btn">Extend</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     const btns = [];
     if (!m) {
@@ -879,6 +931,7 @@ const Staff = {
       <div class="muted" style="font-size:13px">${esc({ reservation: "Reservation fee", balance: "Balance", full: "Full payment", refund: "Refund", other: "Payment" }[p.kind])} · ${esc(p.method || "")}${p.reference_no ? ` · Ref <span class="mono">${esc(p.reference_no)}</span>` : ""} · ${fmtDT(p.submitted_at)}${p.recorded_by ? ` · by ${esc(p.recorded_by)}` : " · by customer"}</div>
       ${p.status !== "submitted" && p.verified_by && p.kind !== "refund" ? `<div class="muted" style="font-size:12.5px">${p.status === "verified" ? "Confirmed" : "Rejected"} by ${esc(p.verified_by)}, ${fmtDT(p.verified_at)}${p.rejection_reason ? ` — “${esc(p.rejection_reason)}”` : ""}</div>` : ""}
       ${p.proofs.map((path) => `<button type="button" class="btn sec sm" data-a="proof" data-p="${esc(path)}" style="align-self:flex-start">View payment screenshot</button>`).join("")}
+      ${p.kind === "refund" && (p.receipt || Staff.can("bookings.cancel")) ? `<div>${receiptCell("refund", p.id, p.receipt, Staff.can("bookings.cancel"))}</div>` : ""}
       ${p.status === "submitted" && Staff.can("bookings.verify_payment") ? `<div class="row"><button class="btn sm" data-a="approve" data-id="${p.id}">${ic("check")} Confirm payment</button><button class="btn sec sm" data-a="rejectm" data-id="${p.id}">Reject</button></div>` : ""}
     </div>`).join("") || `<p class="muted">No payments yet.</p>`;
     return `${mhead(`<span class="bigref">${esc(b.reference)}</span>`, b.booking_type === "open_play" ? "Open Play" : "Court Rental")}
@@ -922,7 +975,7 @@ const Staff = {
       reject: async (f, d) => again(await run(() => rpc("reject_payment", { p_payment_id: Staff.drawer.pay, p_reason: d.reason }), "Payment rejected — the customer has a new deadline to pay.")),
       checkin: async (f, d) => again(await run(() => rpc("check_in_booking", { p_booking_id: b.id, p_players_checked_in: d.players === undefined ? null : Number(d.players) }), "Checked in.")),
       cancel: async (f, d) => again(await run(() => rpc("cancel_booking", { p_booking_id: b.id, p_reason: d.reason, p_refund_amount: d.refund === "" ? null : Number(d.refund) }), (r) => `Cancelled. Refund due ${peso(r.refund_due)}.`)),
-      refund: async (f, d) => again(await run(() => rpc("record_refund", { p_booking_id: b.id, p_amount: Number(d.amount), p_payment_method_id: d.method, p_reference_no: d.refno || null, p_notes: null }), "Refund recorded.")),
+      refund: async (f, d) => again(await run(async () => rpc("record_refund", { p_booking_id: b.id, p_amount: Number(d.amount), p_payment_method_id: d.method, p_reference_no: d.refno || null, p_notes: null, p_receipt_path: await uploadReceipt("refund", d.receipt) }), "Refund recorded.")),
       extend: async (f, d) => again(await run(() => rpc("extend_booking_expiry", { p_booking_id: b.id, p_hours: Number(d.hours) }), "Deadline extended.")),
     });
   },
@@ -1172,8 +1225,8 @@ Views.inventory = async (root, params) => {
   } else if (tab === "purchases") {
     const list = await rpc("staff_purchases", { p_from: addDays(PUB.today, -120), p_to: addDays(PUB.today, 1) });
     body = `<div class="card"><div class="row" style="margin-bottom:12px"><button type="button" class="btn" data-a="purchase">${ic("plus")} Receive stock</button><span class="muted" style="font-size:13px">Purchases add stock and update the average cost. They aren't expenses in the P&L — cost is counted when items sell.</span></div>
-      <div class="scroll-x"><table class="t"><thead><tr><th>No.</th><th>Date</th><th>Supplier</th><th>Invoice</th><th>Items</th><th>Paid via</th><th class="r">Total</th></tr></thead><tbody>
-      ${list.map((p) => `<tr><td class="ref">${esc(p.no)}</td><td>${fmtDate(p.date)}</td><td>${esc(p.supplier || "")}</td><td class="mono">${esc(p.invoice || "")}</td><td>${esc(p.items.map((i) => `${i.qty}× ${i.product} @ ${peso(i.cost)}`).join(", "))}</td><td>${esc(p.method || "")}</td><td class="r num">${p.status === "void" ? `<s>${peso(p.total)}</s>` : peso(p.total)}</td></tr>`).join("") || `<tr><td colspan="7" class="empty">No purchases in the last 4 months.</td></tr>`}</tbody></table></div></div>`;
+      <div class="scroll-x"><table class="t"><thead><tr><th>No.</th><th>Date</th><th>Supplier</th><th>Invoice</th><th>Items</th><th>Paid via</th><th class="r">Total</th><th>Receipt</th></tr></thead><tbody>
+      ${list.map((p) => `<tr><td class="ref">${esc(p.no)}</td><td>${fmtDate(p.date)}</td><td>${esc(p.supplier || "")}</td><td class="mono">${esc(p.invoice || "")}</td><td>${esc(p.items.map((i) => `${i.qty}× ${i.product} @ ${peso(i.cost)}`).join(", "))}</td><td>${esc(p.method || "")}</td><td class="r num">${p.status === "void" ? `<s>${peso(p.total)}</s>` : peso(p.total)}</td><td>${receiptCell("purchase", p.id, p.receipt, p.status !== "void")}</td></tr>`).join("") || `<tr><td colspan="8" class="empty">No purchases in the last 4 months.</td></tr>`}</tbody></table></div></div>`;
   } else {
     const mv = await rpc("staff_movements", { p_limit: 300 });
     const T = { purchase: "Purchase", pos_sale: "POS Sale", adjustment: "Adjustment", return: "Return", damaged: "Damaged", lost: "Lost", other: "Other" };
@@ -1223,14 +1276,15 @@ Views.inventory = async (root, params) => {
         <div class="grid g2">${field("Supplier", inp("supplier", ""))}${field("Purchase date", `<input class="in" type="date" name="date" value="${PUB.today}" required>`)}</div>
         <div class="grid g2">${field("Invoice / reference no.", inp("invoice", ""))}${field("Paid via", sel("method", methods.filter((m) => m.is_active).map((m) => [m.id, m.name])))}</div>
         <div class="stack" style="gap:8px" id="rows"><div class="grid muted" style="grid-template-columns:2fr 1fr 1fr;gap:8px;font-size:12px;font-weight:700"><span>Product</span><span>Quantity</span><span>Unit cost</span></div>${Array.from({ length: n }, (_, i) => row(i)).join("")}</div>
-        <button type="button" class="btn ghost sm" id="more">${ic("plus")} Another item</button>${field("Notes", inp("notes", ""))}<button class="btn">Receive & add to stock</button></form>`,
+        <button type="button" class="btn ghost sm" id="more">${ic("plus")} Another item</button>${field("Notes", inp("notes", ""))}${receiptField("Supplier receipt / invoice (optional)")}<button class="btn">Receive & add to stock</button></form>`,
         bind: (m) => {
           m.querySelector("#more").addEventListener("click", () => m.querySelector("#rows").insertAdjacentHTML("beforeend", row(n++)));
           wire(m, { pu: async (f, d) => {
             const items = []; for (let i = 0; i < n; i++) if (d["p" + i]) items.push({ product_id: d["p" + i], quantity: Math.trunc(Number(d["q" + i])), unit_cost: Number(d["c" + i]) });
             const ok = await run(async () => {
               if (!items.length) fail("Add at least one item."); if (items.some((i) => !(i.quantity > 0) || !(i.unit_cost >= 0))) fail("Each item needs a quantity and a unit cost.");
-              await rpc("create_purchase", { p_purchase_date: d.date, p_items: items, p_supplier_id: null, p_supplier_name: d.supplier || null, p_invoice_no: d.invoice || null, p_payment_method_id: d.method, p_notes: d.notes || null, p_receipt_path: null });
+              const receipt = await uploadReceipt("purchase", d.receipt);
+              await rpc("create_purchase", { p_purchase_date: d.date, p_items: items, p_supplier_id: null, p_supplier_name: d.supplier || null, p_invoice_no: d.invoice || null, p_payment_method_id: d.method, p_notes: d.notes || null, p_receipt_path: receipt });
             }, "Stock received.");
             if (ok) { closeModal(); reload(); }
           } });
@@ -1256,8 +1310,8 @@ Views.expenses = async (root, params) => {
   root.innerHTML = `${pageHead("Expenses", "Operating costs reduce profit. Capital spending (construction, major equipment) is reported separately.", `${all ? `<button type="button" class="btn sec" data-a="salary">Record salary</button>` : ""}<button type="button" class="btn" data-a="add">${ic("plus")} Add expense</button>`)}
     <div class="row" style="margin-bottom:14px"><input class="in" type="month" value="${month}" data-a="month" style="width:auto" aria-label="Month"></div>
     ${all ? `<div class="grid g4" style="margin-bottom:14px"><div class="card stat"><div class="l">Total</div><div class="v num">${peso(sum(live, (e) => e.amount))}</div></div><div class="card stat"><div class="l">Operating</div><div class="v num">${peso(t("operating"))}</div></div><div class="card stat"><div class="l">Capital</div><div class="v num">${peso(t("capital"))}</div></div><div class="card stat"><div class="l">Inventory-type</div><div class="v num">${peso(t("inventory"))}</div><div class="d">Left out of the P&L</div></div></div>` : `<div style="margin-bottom:14px">${notice("You see the expenses you've recorded yourself.")}</div>`}
-    <div class="card"><div class="scroll-x"><table class="t"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Vendor / payee</th><th>Type</th><th class="r">Amount</th><th></th></tr></thead><tbody>
-    ${list.map((e) => { const s = sal.find((x) => x.expense_id === e.id); return `<tr style="${e.status === "void" ? "opacity:.5" : ""}"><td>${fmtDate(e.expense_date)}</td><td>${esc(catName(e.category_id))}</td><td>${esc(e.description)}${s ? `<div class="muted" style="font-size:12.5px">${esc(s.employee_name)} · ${fmtDate(s.period_start, { month: "short", day: "numeric" })}–${fmtDate(s.period_end, { month: "short", day: "numeric" })} · gross ${peso(s.gross_salary)}${Number(s.adjustments) ? `, adj. ${peso(s.adjustments)}` : ""}</div>` : ""}${e.status === "void" ? ` <span class="tag">VOID: ${esc(e.void_reason)}</span>` : ""}</td><td>${esc(e.vendor || "")}</td><td><span class="tag">${esc(e.expense_type)}</span></td><td class="r num">${peso(e.amount)}</td><td>${all && e.status !== "void" ? `<button type="button" class="btn ghost sm" data-a="void" data-id="${e.id}">Void</button>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="7" class="empty">No expenses this month.</td></tr>`}</tbody></table></div></div>`;
+    <div class="card"><div class="scroll-x"><table class="t"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Vendor / payee</th><th>Type</th><th class="r">Amount</th><th>Receipt</th><th></th></tr></thead><tbody>
+    ${list.map((e) => { const s = sal.find((x) => x.expense_id === e.id); return `<tr style="${e.status === "void" ? "opacity:.5" : ""}"><td>${fmtDate(e.expense_date)}</td><td>${esc(catName(e.category_id))}</td><td>${esc(e.description)}${s ? `<div class="muted" style="font-size:12.5px">${esc(s.employee_name)} · ${fmtDate(s.period_start, { month: "short", day: "numeric" })}–${fmtDate(s.period_end, { month: "short", day: "numeric" })} · gross ${peso(s.gross_salary)}${Number(s.adjustments) ? `, adj. ${peso(s.adjustments)}` : ""}</div>` : ""}${e.status === "void" ? ` <span class="tag">VOID: ${esc(e.void_reason)}</span>` : ""}</td><td>${esc(e.vendor || "")}</td><td><span class="tag">${esc(e.expense_type)}</span></td><td class="r num">${peso(e.amount)}</td><td>${receiptCell("expense", e.id, e.receipt_path, e.status !== "void")}</td><td>${all && e.status !== "void" ? `<button type="button" class="btn ghost sm" data-a="void" data-id="${e.id}">Void</button>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="8" class="empty">No expenses this month.</td></tr>`}</tbody></table></div></div>`;
   const reload = () => Views.expenses(root, params);
   wire(root, {
     month: (el) => nav(`#/staff/expenses?m=${el.value}`),
@@ -1266,17 +1320,17 @@ Views.expenses = async (root, params) => {
       ${field("Description", inp("description", "", "required"))}
       <div class="grid g2">${field("Amount", money("amount", "", "required"))}${field("Vendor / payee", inp("vendor", ""))}</div>
       <div class="grid g2">${field("Expense type", sel("expense_type", [["operating", "Operating"], ["capital", "Capital (construction, major equipment)"], ["inventory", "Inventory (left out of P&L)"]], "operating", 'id="xtype"'), "Filled in from the category — change it if needed.")}${field("Paid via", sel("payment_method_id", methods.filter((m) => m.is_active).map((m) => [m.id, m.name])))}</div>
-      ${field("Notes", inp("notes", ""))}<button class="btn">Save expense</button></form>`,
+      ${field("Notes", inp("notes", ""))}${receiptField()}<button class="btn">Save expense</button></form>`,
       bind: (m) => {
         const sync = () => { m.querySelector("#xtype").value = m.querySelector("#xcat").selectedOptions[0]?.dataset.type || "operating"; };
         sync(); m.querySelector("#xcat").addEventListener("change", sync);
-        wire(m, { x: async (f, d) => { const ok = await run(async () => { if (!(Number(d.amount) > 0)) fail("Enter the amount."); await q(sb.from("expenses").insert({ expense_date: d.expense_date, category_id: d.category_id, expense_type: d.expense_type, description: d.description.trim(), amount: Number(d.amount), vendor: d.vendor.trim() || null, payment_method_id: d.payment_method_id, notes: d.notes || null })); }, "Expense saved."); if (ok) { closeModal(); reload(); } } });
+        wire(m, { x: async (f, d) => { const ok = await run(async () => { if (!(Number(d.amount) > 0)) fail("Enter the amount."); const receipt = await uploadReceipt("expense", d.receipt); await q(sb.from("expenses").insert({ receipt_path: receipt, expense_date: d.expense_date, category_id: d.category_id, expense_type: d.expense_type, description: d.description.trim(), amount: Number(d.amount), vendor: d.vendor.trim() || null, payment_method_id: d.payment_method_id, notes: d.notes || null })); }, "Expense saved."); if (ok) { closeModal(); reload(); } } });
       } }),
     salary: () => openModal({ render: () => `${mhead("Record salary")}<form class="stack" data-f="s">${field("Employee", inp("employee", "", "required"))}
       <div class="grid g2">${field("Pay period from", `<input class="in" type="date" name="from" required>`)}${field("to", `<input class="in" type="date" name="to" required>`)}</div>
       <div class="grid g2">${field("Gross salary", money("gross", "", "required"))}${field("Other adjustments", `<span class="affix"><span class="pre">₱</span><input class="in pre num" type="number" step="0.01" name="adj" value="0"></span>`, "Allowances (+) or deductions (−).")}</div>
-      <div class="grid g2">${field("Payment date", `<input class="in" type="date" name="date" value="${PUB.today}" required>`)}${field("Paid via", sel("method", methods.filter((m) => m.is_active).map((m) => [m.id, m.name])))}</div><button class="btn">Save salary</button></form>`,
-      bind: (m) => wire(m, { s: async (f, d) => { const ok = await run(() => rpc("record_salary", { p_employee_name: d.employee.trim(), p_period_start: d.from, p_period_end: d.to, p_gross: Number(d.gross), p_adjustments: Number(d.adj) || 0, p_paid_date: d.date, p_payment_method_id: d.method, p_profile_id: null, p_notes: null }), "Salary recorded."); if (ok) { closeModal(); reload(); } } }) }),
+      <div class="grid g2">${field("Payment date", `<input class="in" type="date" name="date" value="${PUB.today}" required>`)}${field("Paid via", sel("method", methods.filter((m) => m.is_active).map((m) => [m.id, m.name])))}</div>${receiptField("Payslip / proof of payment (optional)")}<button class="btn">Save salary</button></form>`,
+      bind: (m) => wire(m, { s: async (f, d) => { const ok = await run(async () => { const receipt = await uploadReceipt("expense", d.receipt); const id = await rpc("record_salary", { p_employee_name: d.employee.trim(), p_period_start: d.from, p_period_end: d.to, p_gross: Number(d.gross), p_adjustments: Number(d.adj) || 0, p_paid_date: d.date, p_payment_method_id: d.method, p_profile_id: null, p_notes: null }); if (receipt) await rpc("attach_receipt", { p_kind: "expense", p_id: id, p_path: receipt }); }, "Salary recorded."); if (ok) { closeModal(); reload(); } } }) }),
     void: (el) => openModal({ center: true, render: () => `${mhead("Void expense")}<form class="stack" data-f="v">${field("Reason", inp("reason", "", "required"))}<button class="btn bad">Void</button></form>`,
       bind: (m) => wire(m, { v: async (f, d) => { const ok = await run(() => q(sb.from("expenses").update({ status: "void", void_reason: d.reason }).eq("id", el.dataset.id).select()), "Expense voided."); if (ok) { closeModal(); reload(); } } }) }),
   });
@@ -1374,9 +1428,9 @@ Views.investors = async (root, params) => {
     body = `${manage ? `<div class="card" style="margin-bottom:14px"><form class="row" data-f="run" style="align-items:end">${field("Period from", `<input class="in" type="date" name="from" value="${pf}" required>`)}${field("to", `<input class="in" type="date" name="to" value="${pt}" required>`)}<button class="btn">Calculate distribution</button></form><p class="muted" style="font-size:13px;margin-top:8px">Each distribution freezes the net profit and every investor's percentage at that time. Changing percentages later never changes past distributions.</p></div>` : ""}
       ${runs.map((r) => { const ls = dist.filter((d) => d.run_id === r.id); return `<div class="card" style="margin-bottom:14px"><div class="row" style="justify-content:space-between"><div><h2 style="margin:0">${fmtDate(r.period_start, { month: "short", day: "numeric", year: "numeric" })} – ${fmtDate(r.period_end, { month: "short", day: "numeric", year: "numeric" })}</h2>
         <p class="muted">Revenue ${peso(r.total_revenue)} · Cost of goods ${peso(r.total_cogs)} · Operating ${peso(r.total_operating_expenses)} · Capital ${peso(r.total_capital_expenses)} → <b style="color:var(--ink)">To distribute ${peso(r.distributable_amount)}</b></p></div><button type="button" class="btn ghost sm" data-a="exp" data-id="${r.id}">${ic("download")} Export</button></div>
-        <div class="scroll-x"><table class="t" style="margin-top:8px"><thead><tr><th>Investor</th><th class="r">Ownership</th><th class="r">Distribution</th><th>Status</th><th>Paid on</th><th></th></tr></thead><tbody>
-        ${ls.map((l) => `<tr><td>${esc(l.investor_name)}</td><td class="r num">${pct(l.ownership_pct)}</td><td class="r num"><b>${peso(l.amount)}</b></td><td><span class="pill ${l.status === "paid" ? "st-confirmed" : l.status === "approved" ? "st-payment_submitted" : "st-pending_payment"}">${l.status[0].toUpperCase() + l.status.slice(1)}</span></td><td>${l.paid_at ? fmtDate(l.paid_at) : "—"}</td><td class="row" style="gap:6px">${manage && l.status === "pending" ? `<button type="button" class="btn sec sm" data-a="st" data-id="${l.id}" data-to="approved">Approve</button>` : ""}${manage && l.status !== "paid" ? `<button type="button" class="btn sm" data-a="st" data-id="${l.id}" data-to="paid">Mark paid</button>` : ""}</td></tr>`).join("")}
-        <tr><td class="muted">Unallocated ${pct(100 - r.allocated_pct)}</td><td></td><td class="r num muted">${peso(r.distributable_amount * (100 - r.allocated_pct) / 100)}</td><td colspan="3"></td></tr></tbody></table></div></div>`; }).join("") || `<div class="card empty">No distributions yet.</div>`}`;
+        <div class="scroll-x"><table class="t" style="margin-top:8px"><thead><tr><th>Investor</th><th class="r">Ownership</th><th class="r">Distribution</th><th>Status</th><th>Paid on</th><th>Receipt</th><th></th></tr></thead><tbody>
+        ${ls.map((l) => `<tr><td>${esc(l.investor_name)}</td><td class="r num">${pct(l.ownership_pct)}</td><td class="r num"><b>${peso(l.amount)}</b></td><td><span class="pill ${l.status === "paid" ? "st-confirmed" : l.status === "approved" ? "st-payment_submitted" : "st-pending_payment"}">${l.status[0].toUpperCase() + l.status.slice(1)}</span></td><td>${l.paid_at ? fmtDate(l.paid_at) : "—"}${l.payment_reference ? `<div class="muted mono" style="font-size:12px">${esc(l.payment_reference)}</div>` : ""}</td><td>${receiptCell("payout", l.id, l.receipt_path, manage && l.status === "paid")}</td><td class="row" style="gap:6px">${manage && l.status === "pending" ? `<button type="button" class="btn sec sm" data-a="st" data-id="${l.id}" data-to="approved">Approve</button>` : ""}${manage && l.status !== "paid" ? `<button type="button" class="btn sm" data-a="paid" data-id="${l.id}">Mark paid</button>` : ""}</td></tr>`).join("")}
+        <tr><td class="muted">Unallocated ${pct(100 - r.allocated_pct)}</td><td></td><td class="r num muted">${peso(r.distributable_amount * (100 - r.allocated_pct) / 100)}</td><td colspan="4"></td></tr></tbody></table></div></div>`; }).join("") || `<div class="card empty">No distributions yet.</div>`}`;
   }
   root.innerHTML = `${pageHead("Investors", "Ownership and profit sharing. Only people you allow can see this page.")}
     <div class="tabs"><a class="tab-a" href="#/staff/investors" aria-pressed="${tab === "list"}">Investors</a><a class="tab-a" href="#/staff/investors?tab=dist" aria-pressed="${tab !== "list"}">Profit distribution</a></div>${body}`;
@@ -1400,6 +1454,20 @@ Views.investors = async (root, params) => {
     },
     run: async (f, d) => { const ok = await run(() => rpc("create_distribution_run", { p_from: d.from, p_to: d.to, p_notes: null }), "Distribution calculated."); if (ok) reload(); },
     st: async (el) => { const ok = await run(() => q(sb.from("profit_distributions").update({ status: el.dataset.to, ...(el.dataset.to === "paid" ? { paid_at: PUB.today } : {}) }).eq("id", el.dataset.id).select()), "Updated."); if (ok) reload(); },
+    paid: async (el) => {
+      const l = dist.find((x) => x.id === el.dataset.id), methods = await loadMethods();
+      openModal({ center: true, render: () => `${mhead(`Pay ${esc(l.investor_name)}`, peso(l.amount))}<form class="stack" data-f="pd">
+        <div class="grid g2">${field("Paid on", `<input class="in" type="date" name="date" value="${PUB.today}" required>`)}${field("Paid via", sel("method", methods.filter((m) => m.is_active).map((m) => [m.id, m.name])))}</div>
+        ${field("Reference no.", inp("refno", "", 'placeholder="optional"'))}${receiptField("Transfer receipt (optional)")}<button class="btn">${ic("check")} Mark as paid</button></form>`,
+        bind: (m) => wire(m, { pd: async (f, d) => {
+          const ok = await run(async () => {
+            const receipt = await uploadReceipt("payout", d.receipt);
+            await q(sb.from("profit_distributions").update({ status: "paid", paid_at: d.date, payment_method_id: d.method || null, payment_reference: d.refno.trim() || null }).eq("id", l.id).select());
+            if (receipt) await rpc("attach_receipt", { p_kind: "payout", p_id: l.id, p_path: receipt });
+          }, "Marked as paid.");
+          if (ok) { closeModal(); reload(); }
+        } }) });
+    },
     exp: (el) => { const r = runs.find((x) => x.id === el.dataset.id); downloadCSV(`distribution-${r.period_start}-to-${r.period_end}.csv`, [["Period", "Net profit", "Investor", "Ownership %", "Distribution", "Status", "Paid on"], ...dist.filter((l) => l.run_id === r.id).map((l) => [`${r.period_start} to ${r.period_end}`, r.distributable_amount, l.investor_name, l.ownership_pct, l.amount, l.status, l.paid_at || ""])]); },
   });
 };
