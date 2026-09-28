@@ -1444,7 +1444,7 @@ const tm = (name, v, attrs = "") => `<input class="in num" type="time" name="${n
 const isoDays = (name, sel_) => `<div class="row" style="gap:6px 12px">${DOW.map((d, i) => `<label class="check" style="align-items:center"><input type="checkbox" name="${name}" value="${i + 1}" ${sel_.includes(i + 1) ? "checked" : ""}>${d}</label>`).join("")}</div>`;
 Views.settings = async (root, params) => {
   const tab = params.get("tab") || "business";
-  const tabs = [["business", "Business & hours"], ["courts", "Courts"], ["pricing", "Court rental"], ["openplay", "Open Play"], ["booking", "Reservation & cancellation"], ["payments", "Payment methods"], ["pos", "POS & equipment"], ["expenses", "Expense categories"], ["data", "Demo data"]];
+  const tabs = [["business", "Business & hours"], ["courts", "Courts"], ["pricing", "Court rental"], ["openplay", "Open Play"], ["booking", "Reservation & cancellation"], ["payments", "Payment methods"], ["pos", "POS & equipment"], ["expenses", "Expense categories"], ["data", "Test & demo data"]];
   const s = await q(sb.from("business_settings").select("*").eq("id", 1).single());
   const save = `<div class="row" style="justify-content:flex-end;margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><button class="btn">Save changes</button></div>`;
   let body = "", data = {};
@@ -1491,7 +1491,17 @@ Views.settings = async (root, params) => {
     body = `<form class="card pad-lg stack" data-f="expcats"><p class="muted">Operating reduces net profit; capital is shown separately; inventory-type is left out of the P&L (stock is costed when sold). “Staff can use” lets front-desk staff record that category.</p>
       ${data.ec.map((c) => `<div class="grid" style="grid-template-columns:2fr 1fr 1fr auto auto;gap:10px;align-items:end">${field("Name", inp("n_" + c.id, c.name, "required"))}${field("Type", sel("t_" + c.id, [["operating", "Operating"], ["capital", "Capital"], ["inventory", "Inventory"]], c.default_type))}${field("Report group", sel("g_" + c.id, ["salaries", "rent", "utilities", "repairs", "construction", "equipment", "inventory", "marketing", "supplies", "insurance", "professional_fees", "other"].map((g) => [g, g.replace("_", " ")]), c.report_group))}<label class="check" style="min-height:44px;align-items:center"><input type="checkbox" name="s_${c.id}" ${c.staff_allowed ? "checked" : ""}> Staff can use</label><label class="check" style="min-height:44px;align-items:center"><input type="checkbox" name="a_${c.id}" ${c.is_active ? "checked" : ""}> Active</label></div>`).join("")}
       ${field("New category", inp("new_ec", ""))}${save}</form>`; }
-  if (tab === "data") body = `<div class="card pad-lg stack"><h2>Demo data</h2><p class="muted">Demo products and investors are labelled [DEMO]. Remove them before you go live. Products that were already sold are hidden instead of deleted so your sales history stays intact.</p><div class="row"><button type="button" class="btn bad" data-a="purge">Remove demo data</button><button type="button" class="btn sec" data-a="loaddemo">Load demo data</button></div></div>`;
+  if (tab === "data") { const owner = Staff.acct?.role === "owner";
+    data.counts = owner ? await rpc("transaction_counts") : null;
+    const c = data.counts, total = c ? Object.values(c).reduce((a, b) => a + Number(b), 0) : 0;
+    const lines = c ? [["bookings", "bookings"], ["payments", "booking payments"], ["pos_sales", "POS sales"], ["rentals", "equipment rentals"], ["purchases", "purchases"], ["expenses", "expenses"], ["stock_moves", "stock movements"], ["cash_counts", "cash counts"], ["distributions", "profit distributions"]].filter(([k]) => Number(c[k]) > 0).map(([k, l]) => `<li><b>${c[k]}</b> ${l}</li>`).join("") : "";
+    body = (owner ? `<form class="card pad-lg stack" data-f="clearall" style="border:1.5px solid var(--bad)"><h2>Clear test transactions</h2>
+      <p class="muted">Use this once before you open, to wipe everything you entered while testing. It removes <b>all</b> bookings, payments, POS sales, equipment rentals, purchases, expenses, stock movements, cash counts and profit distributions, and restarts booking numbers from 0001. Product stock goes back to 0 and all paddles and balls are marked available — enter your real stock afterwards with Purchases or Adjust stock.</p>
+      <p class="muted">Kept: settings, prices, courts, Open Play session settings, products, payment methods, equipment, investors, team accounts and the audit log.</p>
+      ${total ? `<div class="sub"><p style="margin:0 0 6px"><b>Will be removed:</b></p><ul style="margin:0;padding-left:18px">${lines}</ul></div>
+      ${field("Type DELETE to confirm", inp("confirm", "", 'autocomplete="off" required placeholder="DELETE"'), "This can't be undone.")}
+      <div class="row"><button class="btn bad">Clear all transactions</button></div>` : `<p><b>There are no transactions to clear.</b></p>`}</form>` : "")
+      + `<div class="card pad-lg stack"><h2>Demo data</h2><p class="muted">Demo products and investors are labelled [DEMO]. Remove them before you go live. Products that were already sold are hidden instead of deleted so your sales history stays intact.</p><div class="row"><button type="button" class="btn bad" data-a="purge">Remove demo data</button><button type="button" class="btn sec" data-a="loaddemo">Load demo data</button></div></div>`; }
   root.innerHTML = `${pageHead("Settings", "Prices, hours, policies and payment details. Every change is recorded in the audit log.")}
     <div class="tabs">${tabs.map(([k, l]) => `<a class="tab-a" href="#/staff/settings?tab=${k}" aria-pressed="${tab === k}">${l}</a>`).join("")}</div>${body}`;
   const reload = async () => { PUB = await rpc("get_public_settings"); Staff.methods = null; Views.settings(root, params); };
@@ -1568,6 +1578,12 @@ Views.settings = async (root, params) => {
         for (const c of data.ec) await q(sb.from("expense_categories").update({ name: g("n_" + c.id), default_type: g("t_" + c.id), report_group: g("g_" + c.id), staff_allowed: g("s_" + c.id) === "on", is_active: g("a_" + c.id) === "on" }).eq("id", c.id).select());
         if (g("new_ec")?.trim()) await q(sb.from("expense_categories").insert({ name: g("new_ec").trim(), sort_order: data.ec.length + 1 }).select());
       }, "Expense categories saved.");
+      if (ok) reload();
+    },
+    clearall: async (f) => {
+      const conf = new FormData(f).get("confirm");
+      if (String(conf || "").trim().toUpperCase() !== "DELETE") return toast("Type DELETE to confirm.", true);
+      const ok = await run(() => rpc("clear_all_transactions", { p_confirm: conf }), "All test transactions cleared. You're ready to open.");
       if (ok) reload();
     },
     purge: async () => { const ok = await run(() => rpc("purge_demo_data"), (r) => `Demo data removed (${r.products_deleted} products, ${r.investors_deleted} investors).`); if (ok) reload(); },
