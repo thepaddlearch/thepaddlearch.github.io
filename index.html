@@ -575,6 +575,10 @@ const Site = {
     try { b = token ? await rpc("get_my_booking", { p_reference: ref, p_token: token }) : null; } catch (e) { console.error(e); }
     if (!b) { nav(`#/find?ref=${encodeURIComponent(ref)}`); return; }
     rememberBooking(b.reference, token);
+    const mpage = PUB.messenger_page_username;
+    const msgr = mpage && ["pending_payment", "payment_submitted", "confirmed"].includes(b.status) ? (b.messenger_linked
+      ? `<div class="card row" style="gap:10px;align-items:center;justify-content:center"><span class="pill st-confirmed">Messenger connected</span><span class="muted" style="font-size:13.5px">${b.status === "confirmed" ? "We've sent your reservation details on Messenger." : "We'll message you on Messenger as soon as your slot is reserved."}</span></div>`
+      : `<div class="card stack" style="text-align:center;align-items:center"><h3>Get updates on Messenger</h3><p class="muted" style="max-width:420px;font-size:14px">Tap below and open the chat with us in Messenger (tap <b>Get Started</b> if asked). We'll message you there as soon as your payment is confirmed and your slot is reserved.</p><a class="btn" style="background:#0866FF;border-color:#0866FF;color:#fff" href="https://m.me/${encodeURIComponent(mpage)}?ref=${encodeURIComponent(token)}" target="_blank" rel="noopener">Get updates on Messenger</a></div>`) : "";
     const submitted = sum((b.payments || []).filter((p) => p.status === "submitted"), (p) => p.amount);
     const needFee = round2(Math.max(b.reservation_fee_amount - b.amount_paid - submitted, 0));
     const canPay = ["pending_payment", "payment_submitted"].includes(b.status) && needFee > 0;
@@ -589,6 +593,7 @@ const Site = {
         <p class="muted" style="max-width:440px">${b.status === "pending_payment" ? `We're holding your slot until <b style="color:var(--ink)">${fmtDT(b.expires_at)}</b> (${relTime(b.expires_at)}). If the reservation fee isn't paid by then, the slot is released.` : b.status === "payment_submitted" ? "We'll confirm your booking once we've verified your payment. Check back here anytime." : b.status === "expired" ? "This reservation has expired because payment was not received within the reservation period. You're welcome to book again." : "Please keep this reference number."}</p>
         <div class="row" style="justify-content:center"><button class="btn sec sm" data-a="copy" data-t="${esc(link)}">Copy booking link</button></div>
       </div>
+      ${msgr}
       <div class="card"><dl class="kv"><dt>Name</dt><dd>${esc(b.customer_name)}</dd><dt>When</dt><dd>${when}</dd><dt>What</dt><dd>${what}</dd></dl></div>
       <div class="total-box"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd><dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd><dt>Paid so far</dt><dd>${peso(b.amount_paid)}</dd>${submitted ? `<dt>Being checked</dt><dd>${peso(submitted)}</dd>` : ""}<dt>Balance (pay at the counter)</dt><dd class="big">${peso(b.balance_due)}</dd></dl></div>
       ${(b.payments || []).filter((p) => p.status === "rejected").map((p) => notice(`A payment of ${peso(p.amount)} couldn't be confirmed${p.rejection_reason ? `: “${esc(p.rejection_reason)}”` : ""}. Please upload a clearer receipt.`, "warn")).join("")}
@@ -886,7 +891,15 @@ const Staff = {
   },
   async reloadBooking() {
     try { Staff.drawer.b = await rpc("staff_booking", { p_id: Staff.drawer.id }); } catch (e) { toast(friendly(e), true); }
+    try { Staff.drawer.msg = await rpc("staff_booking_messenger", { p_booking_id: Staff.drawer.id }); } catch (e) { Staff.drawer.msg = null; }
     openModal({ render: Staff.drawerHTML, bind: Staff.drawerBind });
+  },
+  msgLine(b) {
+    const x = Staff.drawer.msg; if (!x) return "";
+    const sent = x.notify_status === "sent" || x.notify_status === "sent_utility";
+    const s = sent ? `Reserved message sent ${fmtDT(x.notified_at)}` : x.notify_status === "failed" ? `Couldn't send: ${esc(x.notify_error || "unknown error")}` : "Connected. The customer gets a message when the booking is reserved.";
+    const can = Staff.can("bookings.verify_payment") && ["confirmed", "checked_in"].includes(b.status);
+    return `<div class="sub row" style="justify-content:space-between;gap:8px;align-items:center"><span style="font-size:13.5px"><b>Messenger</b> · ${s}</span>${can ? `<button class="btn sec sm" type="button" data-a="msend">${sent ? "Send again" : "Send now"}</button>` : ""}</div>`;
   },
   drawerHTML() {
     const b = Staff.drawer.b, m = Staff.drawer.mode;
@@ -943,6 +956,7 @@ const Staff = {
         ${b.booking_type === "open_play" && b.players_checked_in != null ? `<dt>Checked in</dt><dd>${b.players_checked_in} of ${b.player_count}</dd>` : ""}
         <dt>Booked</dt><dd style="font-weight:500">${fmtDT(b.created_at)} · ${esc({ online: "online by customer", walk_in: "walk-in", phone: "phone / Messenger", admin: "admin" }[b.source] || b.source)}${b.created_by_name ? ` (${esc(b.created_by_name)})` : ""}</dd>
         ${b.notes ? `<dt>Notes</dt><dd style="font-weight:500">${esc(b.notes)}</dd>` : ""}</dl></div>
+      ${Staff.msgLine(b)}
       <div class="card"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd><dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd><dt>Paid (confirmed)</dt><dd>${peso(b.amount_paid)}</dd>
         ${pend ? `<dt>Waiting for review</dt><dd style="color:var(--info)">${peso(pend)}</dd>` : ""}${Number(b.amount_refunded) ? `<dt>Refunded</dt><dd>${peso(b.amount_refunded)}</dd>` : ""}
         <dt>Outstanding</dt><dd style="color:${bal > 0 ? "var(--warn)" : "var(--g7)"}">${st === "cancelled" || st === "expired" ? "—" : peso(bal)}</dd></dl></div>
@@ -969,13 +983,19 @@ const Staff = {
           <a href="${esc(url)}" target="_blank" rel="noopener" class="muted" style="font-size:13px">Open full size</a></div>`);
         el.textContent = "Hide payment screenshot";
       },
-      approve: async (el) => again(await run(() => rpc("verify_payment", { p_payment_id: el.dataset.id, p_force_confirm: false }), (r) => `Payment confirmed — booking is ${STATUS_LABEL[r.booking_status]}.`)),
+      approve: async (el) => { await again(await run(() => rpc("verify_payment", { p_payment_id: el.dataset.id, p_force_confirm: false }), (r) => `Payment confirmed — booking is ${STATUS_LABEL[r.booking_status]}.`)); if (Staff.drawer?.msg && Staff.drawer.id === b.id) setTimeout(() => { if (Staff.drawer?.id === b.id) Staff.reloadBooking(); }, 4000); },
       outcome: async (el) => again(await run(() => rpc("set_booking_outcome", { p_booking_id: b.id, p_outcome: el.dataset.to }), "Updated.")),
-      pay: async (f, d) => again(await run(() => rpc("record_booking_payment", { p_booking_id: b.id, p_amount: Number(d.amount), p_payment_method_id: d.method, p_kind: d.kind, p_reference_no: d.refno || null, p_notes: null }), (r) => r.booking_status === "confirmed" ? "Payment saved — booking confirmed." : "Payment saved.")),
+      pay: async (f, d) => again(await run(() => rpc("record_booking_payment", { p_booking_id: b.id, p_amount: Number(d.amount), p_payment_method_id: d.method, p_kind: d.kind, p_reference_no: d.refno || null, p_notes: null }), (r) => r.booking_status === "confirmed" ? "Payment saved — booking reserved." : "Payment saved.")),
       reject: async (f, d) => again(await run(() => rpc("reject_payment", { p_payment_id: Staff.drawer.pay, p_reason: d.reason }), "Payment rejected — the customer has a new deadline to pay.")),
       checkin: async (f, d) => again(await run(() => rpc("check_in_booking", { p_booking_id: b.id, p_players_checked_in: d.players === undefined ? null : Number(d.players) }), "Checked in.")),
       cancel: async (f, d) => again(await run(() => rpc("cancel_booking", { p_booking_id: b.id, p_reason: d.reason, p_refund_amount: d.refund === "" ? null : Number(d.refund) }), (r) => `Cancelled. Refund due ${peso(r.refund_due)}.`)),
       refund: async (f, d) => again(await run(async () => rpc("record_refund", { p_booking_id: b.id, p_amount: Number(d.amount), p_payment_method_id: d.method, p_reference_no: d.refno || null, p_notes: null, p_receipt_path: await uploadReceipt("refund", d.receipt) }), "Refund recorded.")),
+      msend: async () => again(await run(async () => {
+        const { data, error } = await sb.functions.invoke("messenger", { body: { action: "resend", booking_id: b.id } });
+        if (error) throw error;
+        if (!data?.sent) throw new Error(data?.error || "The message wasn't sent. The customer may not be connected on Messenger.");
+        return data;
+      }, "Message sent on Messenger.")),
       extend: async (f, d) => again(await run(() => rpc("extend_booking_expiry", { p_booking_id: b.id, p_hours: Number(d.hours) }), "Deadline extended.")),
     });
   },
@@ -1511,7 +1531,7 @@ const tm = (name, v, attrs = "") => `<input class="in num" type="time" name="${n
 const isoDays = (name, sel_) => `<div class="row" style="gap:6px 12px">${DOW.map((d, i) => `<label class="check" style="align-items:center"><input type="checkbox" name="${name}" value="${i + 1}" ${sel_.includes(i + 1) ? "checked" : ""}>${d}</label>`).join("")}</div>`;
 Views.settings = async (root, params) => {
   const tab = params.get("tab") || "business";
-  const tabs = [["business", "Business & hours"], ["courts", "Courts"], ["pricing", "Court rental"], ["openplay", "Open Play"], ["booking", "Reservation & cancellation"], ["payments", "Payment methods"], ["pos", "POS & equipment"], ["expenses", "Expense categories"], ["data", "Test & demo data"]];
+  const tabs = [["business", "Business & hours"], ["courts", "Courts"], ["pricing", "Court rental"], ["openplay", "Open Play"], ["booking", "Reservation & cancellation"], ["payments", "Payment methods"], ["pos", "POS & equipment"], ["expenses", "Expense categories"], ["messenger", "Messenger"], ["data", "Test & demo data"]];
   const s = await q(sb.from("business_settings").select("*").eq("id", 1).single());
   const save = `<div class="row" style="justify-content:flex-end;margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><button class="btn">Save changes</button></div>`;
   let body = "", data = {};
@@ -1558,6 +1578,12 @@ Views.settings = async (root, params) => {
     body = `<form class="card pad-lg stack" data-f="expcats"><p class="muted">Operating reduces net profit; capital is shown separately; inventory-type is left out of the P&L (stock is costed when sold). “Staff can use” lets front-desk staff record that category.</p>
       ${data.ec.map((c) => `<div class="grid" style="grid-template-columns:2fr 1fr 1fr auto auto;gap:10px;align-items:end">${field("Name", inp("n_" + c.id, c.name, "required"))}${field("Type", sel("t_" + c.id, [["operating", "Operating"], ["capital", "Capital"], ["inventory", "Inventory"]], c.default_type))}${field("Report group", sel("g_" + c.id, ["salaries", "rent", "utilities", "repairs", "construction", "equipment", "inventory", "marketing", "supplies", "insurance", "professional_fees", "other"].map((g) => [g, g.replace("_", " ")]), c.report_group))}<label class="check" style="min-height:44px;align-items:center"><input type="checkbox" name="s_${c.id}" ${c.staff_allowed ? "checked" : ""}> Staff can use</label><label class="check" style="min-height:44px;align-items:center"><input type="checkbox" name="a_${c.id}" ${c.is_active ? "checked" : ""}> Active</label></div>`).join("")}
       ${field("New category", inp("new_ec", ""))}${save}</form>`; }
+  if (tab === "messenger") body = `<form class="card pad-lg stack" data-f="settings"><h2>Messenger updates</h2>
+    <p class="muted" style="margin-top:-6px">Customers can tap “Get updates on Messenger” on their booking page. When you confirm their payment, your Facebook Page messages them automatically that their slot is reserved.</p>
+    <label class="check"><input type="checkbox" name="messenger_enabled" ${s.messenger_enabled ? "checked" : ""}> Send Messenger updates to customers</label>
+    ${field("Facebook Page username", inp("messenger_page_username", s.messenger_page_username || "", 'placeholder="e.g. thepaddlearch"'), "The part after facebook.com/ in your Page link. You can also paste the whole link.")}
+    ${field("Reserved message", `<textarea class="in" name="messenger_reserved_text" rows="7">${esc(s.messenger_reserved_text || "")}</textarea>`, "You can use {name}, {reference}, {when}, {details} and {balance}. They're filled in for each customer.")}
+    <div class="row" style="align-items:center"><button type="button" class="btn sec" data-a="mtest">Check Facebook connection</button><span class="muted" id="mtest-out" style="font-size:13.5px"></span></div>${save}</form>`;
   if (tab === "data") { const owner = Staff.acct?.role === "owner";
     data.counts = owner ? await rpc("transaction_counts") : null;
     const c = data.counts, total = c ? Object.values(c).reduce((a, b) => a + Number(b), 0) : 0;
@@ -1575,6 +1601,14 @@ Views.settings = async (root, params) => {
   const num = (v) => (v === "" || v == null ? null : Number(v));
   const coverage = async () => { const p = await rpc("rate_coverage_problem"); if (p) toast(`Saved, but check your rates: ${p}`, true); };
   wire(root, {
+    mtest: async () => {
+      const out = root.querySelector("#mtest-out"); out.textContent = "Checking…";
+      try {
+        const { data, error } = await sb.functions.invoke("messenger", { body: { action: "setup" } });
+        if (error) { let m = error.message; try { m = (await error.context.json()).error || m; } catch (_) {} throw new Error(m); }
+        out.innerHTML = `Connected to <b>${esc(data.page)}</b>. Get Started button: ${esc(String(data.get_started))}. Reserved-message template: ${esc(String(data.template))}.`;
+      } catch (e) { out.textContent = `Not connected yet: ${e.message}`; }
+    },
     settings: async (f, d) => {
       const fd = new FormData(f), patch = {};
       for (const el of f.elements) {
@@ -1584,6 +1618,8 @@ Views.settings = async (root, params) => {
         else patch[el.name] = el.value.trim() === "" ? null : el.value.trim();
       }
       if (patch.booking_ref_prefix) patch.booking_ref_prefix = patch.booking_ref_prefix.toUpperCase();
+      if (patch.messenger_page_username) patch.messenger_page_username = patch.messenger_page_username.replace(/^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|m\.me)\//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
+      if ("messenger_reserved_text" in patch && !patch.messenger_reserved_text) delete patch.messenger_reserved_text;
       void fd;
       const ok = await run(() => q(sb.from("business_settings").update(patch).eq("id", 1).select()), "Saved.");
       if (ok) reload();
