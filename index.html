@@ -335,13 +335,20 @@ const CONFIGURED = !/YOUR-PROJECT|PASTE/.test(CONFIG.SUPABASE_URL + CONFIG.SUPAB
 const sb = CONFIGURED && window.supabase ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } }) : null;
 class UserError extends Error {}
 const fail = (m) => { throw new UserError(m); };
+// Staff sign in with a username. Supabase needs an email, so a username maps to a hidden
+// address on the reserved ".invalid" domain (never deliverable). Old email logins still work.
+const STAFF_DOMAIN = "staff.thepaddlearch.invalid";
+const USERNAME_RE = /^[a-z0-9][a-z0-9._-]{2,29}$/;
+const loginEmail = (v) => { const s = String(v || "").trim().toLowerCase(); return s.includes("@") ? s : `${s}@${STAFF_DOMAIN}`; };
+const userLabel = (email) => { const e = String(email || ""); return e.toLowerCase().endsWith("@" + STAFF_DOMAIN) ? "Username: " + e.slice(0, -(STAFF_DOMAIN.length + 1)) : e; };
 function friendly(err) {
   if (!err) return "Something went wrong. Please try again.";
   if (err instanceof UserError) return err.message;
   const m = String(err.message || err.error_description || err);
   if (/row-level security|permission denied|42501/.test(m) || err.code === "42501") return /You do not have|You don't|Only /.test(m) ? m : "You don't have permission to do that.";
   if (/Failed to fetch|NetworkError|network/i.test(m)) return "Can't reach the server. Check your internet connection and try again.";
-  if (/Invalid login credentials/i.test(m)) return "Incorrect email or password.";
+  if (/Invalid login credentials/i.test(m)) return "Incorrect username or password.";
+  if (/already registered|already been registered|user_already_exists/i.test(m)) return "That username is already taken. Please choose another.";
   if (/duplicate key/.test(m)) return "That name or code is already in use.";
   if (/JWT expired/i.test(m)) return "Your session expired. Please sign in again.";
   return m.replace(/^ERROR:\s*/, "");
@@ -860,24 +867,28 @@ const Staff = {
     APP.innerHTML = `<div class="login">${logoBlock(140)}
       <div class="card stack"><div class="seg" style="align-self:flex-start"><button type="button" data-a="m" data-m="" aria-pressed="${!signup}">Sign in</button><button type="button" data-a="m" data-m="signup" aria-pressed="${signup}">Create account</button></div>
       ${signup ? `<h2>Create a staff account</h2><p class="muted" style="font-size:14px">The very first account becomes the <b>owner</b>. After that, new accounts wait for the owner's approval.</p>
-        <form class="stack" data-f="signup">${field("Full name", inp("name", "", 'required autocomplete="name"'))}${field("Email", inp("email", "", 'type="email" required autocomplete="email"'))}${field("Password", inp("password", "", 'type="password" required minlength="8" autocomplete="new-password"'), "At least 8 characters.")}<button class="btn block">Create account</button></form>`
-      : `<h2>Staff sign-in</h2><form class="stack" data-f="signin">${field("Email", inp("email", "", 'type="email" required autocomplete="email"'))}${field("Password", inp("password", "", 'type="password" required autocomplete="current-password"'))}<button class="btn block">Sign in</button></form>
+        <form class="stack" data-f="signup">${field("Full name", inp("name", "", 'required autocomplete="name"'))}${field("Username", inp("username", "", 'required autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="30"'), "3–30 letters or numbers (you can also use . _ -). You'll use this to sign in.")}${field("Password", inp("password", "", 'type="password" required minlength="8" autocomplete="new-password"'), "At least 8 characters.")}<button class="btn block">Create account</button></form>`
+      : `<h2>Staff sign-in</h2><form class="stack" data-f="signin">${field("Username", inp("login", "", 'required autocomplete="username" autocapitalize="none" spellcheck="false"'), "The owner can also sign in with their email.")}${field("Password", inp("password", "", 'type="password" required autocomplete="current-password"'))}<button class="btn block">Sign in</button></form>
         <button type="button" class="btn ghost sm" data-a="forgot" style="align-self:flex-start">Forgot password?</button>`}
       </div><p class="muted" style="text-align:center;margin-top:16px"><a href="#/">← Back to the booking site</a></p></div>`;
     wire(APP, {
       m: (el) => nav(el.dataset.m ? "#/staff?mode=signup" : "#/staff"),
-      signin: async (f, d) => { const ok = await run(async () => { const { error } = await sb.auth.signInWithPassword({ email: d.email.trim(), password: d.password }); if (error) throw error; }); if (ok) render(); },
+      signin: async (f, d) => { const ok = await run(async () => { const { error } = await sb.auth.signInWithPassword({ email: loginEmail(d.login), password: d.password }); if (error) throw error; }); if (ok) render(); },
       signup: async (f, d) => {
         const ok = await run(async () => {
-          const { data, error } = await sb.auth.signUp({ email: d.email.trim(), password: d.password, options: { data: { full_name: d.name.trim() }, emailRedirectTo: location.origin + location.pathname + "#/staff" } });
+          const username = d.username.trim().toLowerCase();
+          if (!USERNAME_RE.test(username)) fail("Usernames are 3–30 characters: letters, numbers, dot, underscore or dash, starting with a letter or number.");
+          const { data, error } = await sb.auth.signUp({ email: loginEmail(username), password: d.password, options: { data: { full_name: d.name.trim(), username }, emailRedirectTo: location.origin + location.pathname + "#/staff" } });
           if (error) throw error;
-          if (!data.session) fail("Account created. Check your email to confirm it, then sign in.");
+          if (!data.session) fail("Account created. Please sign in with your username.");
         });
         if (ok) render();
       },
       forgot: async () => {
-        const email = APP.querySelector("#f-email")?.value.trim();
-        if (!email) return toast("Type your email above first.", true);
+        const login = APP.querySelector("#f-login")?.value.trim();
+        if (!login) return toast("Type your username (or the owner's email) above first.", true);
+        if (!login.includes("@")) return toast("Forgot your password? Please ask the owner for help.", true);
+        const email = login;
         await run(async () => { const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname + "#/staff/reset" }); if (error) throw error; }, "Check your email for a link to reset your password.");
       },
     });
@@ -1500,8 +1511,8 @@ Views.team = async (root) => {
   root.innerHTML = `${pageHead("Users & Staff", "Staff sign in on this website with their own email and password. Choose exactly what each person can do.")}
     <div class="card" style="margin-bottom:14px"><h2>Adding someone</h2><p class="muted">Ask them to open <b>${esc(location.origin + location.pathname)}#/staff</b>, choose <b>Create account</b>, and sign up. They'll appear below as <b>Waiting for approval</b> — approve them and pick their access.</p>
       <div class="row" style="margin-top:10px"><button type="button" class="btn sec sm" data-a="copy" data-t="${esc(location.origin + location.pathname + "#/staff?mode=signup")}">Copy sign-up link</button></div></div>
-    ${pending.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--warn-line)"><h2>Waiting for approval (${pending.length})</h2>${pending.map((u) => `<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;margin-top:10px"><div><b>${esc(u.full_name)}</b><div class="muted">${esc(u.email)} · signed up ${fmtDT(u.created_at)}</div></div><div class="row"><button type="button" class="btn sm" data-a="approve" data-id="${u.id}" data-role="staff">Approve as staff</button><button type="button" class="btn sec sm" data-a="approve" data-id="${u.id}" data-role="manager">Approve as manager</button></div></div>`).join("")}</div>` : ""}
-    <div class="stack">${team.filter((u) => u.is_active).map((u) => `<details class="card"><summary class="row" style="cursor:pointer;list-style:none;justify-content:space-between"><div><b>${esc(u.full_name)}</b> ${u.id === Staff.acct.id ? '<span class="muted">(you)</span>' : ""}<div class="muted" style="font-size:13px">${esc(u.email)}</div></div><span class="pill ${u.role === "owner" ? "st-checked_in" : "st-completed"}">${u.role === "owner" ? "Owner" : u.permissions.includes("bookings.verify_payment") ? "Manager" : "Staff"}</span></summary>
+    ${pending.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--warn-line)"><h2>Waiting for approval (${pending.length})</h2>${pending.map((u) => `<div class="row" style="justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;margin-top:10px"><div><b>${esc(u.full_name)}</b><div class="muted">${esc(userLabel(u.email))} · signed up ${fmtDT(u.created_at)}</div></div><div class="row"><button type="button" class="btn sm" data-a="approve" data-id="${u.id}" data-role="staff">Approve as staff</button><button type="button" class="btn sec sm" data-a="approve" data-id="${u.id}" data-role="manager">Approve as manager</button></div></div>`).join("")}</div>` : ""}
+    <div class="stack">${team.filter((u) => u.is_active).map((u) => `<details class="card"><summary class="row" style="cursor:pointer;list-style:none;justify-content:space-between"><div><b>${esc(u.full_name)}</b> ${u.id === Staff.acct.id ? '<span class="muted">(you)</span>' : ""}<div class="muted" style="font-size:13px">${esc(userLabel(u.email))}</div></div><span class="pill ${u.role === "owner" ? "st-checked_in" : "st-completed"}">${u.role === "owner" ? "Owner" : u.permissions.includes("bookings.verify_payment") ? "Manager" : "Staff"}</span></summary>
       <div class="stack" style="margin-top:14px">
         ${u.role !== "owner" ? `<form data-f="perm" data-id="${u.id}"><div class="grid g3">${Object.entries(groups).map(([g, items]) => `<fieldset style="border:0;padding:0;margin:0"><legend class="eyebrow" style="margin-bottom:6px">${esc(g)}</legend>${items.map((p) => `<label class="check" style="padding:3px 0"><input type="checkbox" name="perm" value="${p.key}" ${u.permissions.includes(p.key) ? "checked" : ""}><span>${esc(p.description)}${p.is_sensitive ? ' <span style="color:var(--clay);font-size:12px;font-weight:700">sensitive</span>' : ""}</span></label>`).join("")}</fieldset>`).join("")}</div>
           <div class="row" style="margin-top:12px"><button class="btn sm">Save access</button><button type="button" class="btn ghost sm" data-a="preset" data-id="${u.id}" data-p="staff">Staff defaults</button><button type="button" class="btn ghost sm" data-a="preset" data-id="${u.id}" data-p="manager">Manager defaults</button><span style="flex:1"></span>${u.id !== Staff.acct.id ? `<button type="button" class="btn ghost sm" data-a="deact" data-id="${u.id}" style="color:var(--bad)">Remove access</button>` : ""}</div></form>`
