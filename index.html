@@ -303,7 +303,7 @@ const pesoF = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP
 const peso = (n) => pesoF.format(Number(n) || 0);
 const pct = (n) => `${round2(n)}%`;
 const formData = (f) => Object.fromEntries(new FormData(f).entries());
-const STATUS_LABEL = { pending_payment: "Pending Payment", payment_submitted: "Payment Submitted", confirmed: "Confirmed", checked_in: "Checked In", completed: "Completed", cancelled: "Cancelled", no_show: "No Show", expired: "Expired" };
+const STATUS_LABEL = { pending_payment: "Pending Payment", payment_submitted: "Payment Submitted", confirmed: "Reserved", checked_in: "Checked In", completed: "Completed", cancelled: "Cancelled", no_show: "No Show", expired: "Expired" };
 const BUCKET_LABEL = { open_play: "Open Play", court_rental: "Court Rental", snacks: "Snacks", drinks: "Drinks", food: "Food", paddle_rental: "Paddle Rental", ball_rental: "Ball Rental", other: "Other" };
 const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -545,7 +545,7 @@ const Site = {
       <section class="grid g3" style="margin-top:16px">
         <div class="card"><p class="eyebrow">Hours</p><p style="margin-top:6px"><b>${clock(PUB.open_time)} – ${clock(PUB.close_time)}</b><br><span class="muted">Every day</span></p></div>
         <div class="card"><p class="eyebrow">Court rates</p><div style="margin-top:6px">${(PUB.rates || []).map((r) => `<div class="row" style="justify-content:space-between"><span class="muted">${clock(r.start_time)} – ${clock(r.end_time)}</span><b>${peso(r.rate_per_hour)}/hr</b></div>`).join("")}</div></div>
-        <div class="card"><p class="eyebrow">How it works</p><p class="muted" style="margin-top:6px">Book → pay ${Number(PUB.reservation_fee_pct)}% to reserve → upload your receipt → we confirm. Pay the rest at the counter.</p></div>
+        <div class="card"><p class="eyebrow">How it works</p><p class="muted" style="margin-top:6px">Book → pay at least ${Number(PUB.reservation_fee_pct)}% to reserve → upload your receipt → we confirm → pay the rest at the counter.</p></div>
       </section>
       ${PUB.cancellation_policy_text ? `<p class="muted" style="font-size:13px;margin-top:16px;max-width:760px">Cancellation policy: ${esc(PUB.cancellation_policy_text)}</p>` : ""}`);
   },
@@ -581,7 +581,7 @@ const Site = {
     const link = location.origin + location.pathname + bookingLink(b.reference, token);
     const when = `${fmtDate(b.business_date, { weekday: "long", month: "long", day: "numeric" })} · ${fmtRange(b.starts_at, b.ends_at)}`;
     const what = b.booking_type === "open_play" ? `Open Play · ${b.player_count} player${b.player_count > 1 ? "s" : ""}` : `Court Rental · ${(b.courts || []).map((c) => esc(c.court)).join(", ")}`;
-    const headline = { pending_payment: "Pay the reservation fee to secure your slot", payment_submitted: "Payment received — we're checking it", confirmed: "You're booked!", checked_in: "Enjoy your game!", completed: "Thanks for playing", cancelled: "This booking was cancelled", expired: "This reservation has expired", no_show: "Marked as no-show" }[b.status];
+    const headline = { pending_payment: "Pay the reservation fee to secure your slot", payment_submitted: "Payment received — we're checking it", confirmed: "Your slot is reserved!", checked_in: "Enjoy your game!", completed: "Thanks for playing", cancelled: "This booking was cancelled", expired: "This reservation has expired", no_show: "Marked as no-show" }[b.status];
     APP.innerHTML = siteShell(`<div class="pub-narrow stack">
       <div class="card stack" style="text-align:center;align-items:center">
         <p class="eyebrow">Booking reference</p><div class="bigref">${esc(b.reference)}</div>${statusPill(b.status)}
@@ -1045,7 +1045,7 @@ function schedGrid(day, compact = false) {
   const slots = Array.from({ length: rows }, (_, i) => `<div class="slot ${i % 2 ? "hour" : ""}" style="height:${step * ppm}px"></div>`).join("");
   const cols = day.courts.map((c) => `<div class="col">${slots}${blocks[c.id].map((k) => `<${k.tag} class="blk ${k.cls}" ${k.attrs} style="top:${k.s * ppm + 1}px;height:${(k.e - k.s) * ppm - 3}px;text-decoration:none">${k.title}${(k.e - k.s) * ppm > 34 ? `<small>${k.sub}</small>` : ""}</${k.tag}>`).join("")}${now >= 0 && now <= len ? `<div class="nowline" style="top:${now * ppm}px"></div>` : ""}${c.status === "maintenance" ? `<div class="blk completed" style="top:2px;bottom:2px;height:auto;cursor:default">Maintenance</div>` : ""}</div>`).join("");
   return `<div class="scroll-x"><div class="sched" style="grid-template-columns:64px repeat(${day.courts.length},minmax(130px,1fr))"><div class="h"></div>${day.courts.map((c) => `<div class="h">${esc(c.name)}</div>`).join("")}<div>${timeCol}</div>${cols}</div></div>
-  <div class="legend" style="margin-top:10px"><span><i style="background:#fff;border-color:var(--line-2)"></i>Available</span><span><i style="background:var(--warn-bg);border-color:var(--warn-line)"></i>Pending payment</span><span><i style="background:var(--info-bg);border-color:var(--info-line)"></i>Payment submitted</span><span><i style="background:var(--g1);border-color:var(--g5)"></i>Confirmed</span><span><i style="background:var(--g7);border-color:var(--g8)"></i>Checked in</span><span><i style="background:repeating-linear-gradient(135deg,var(--g1) 0 4px,#EAF3EC 4px 8px);border-color:var(--g2)"></i>Open Play</span><span><i style="background:#F0EEEA;border-color:#DDD8CE"></i>Completed</span></div>`;
+  <div class="legend" style="margin-top:10px"><span><i style="background:#fff;border-color:var(--line-2)"></i>Available</span><span><i style="background:var(--warn-bg);border-color:var(--warn-line)"></i>Pending payment</span><span><i style="background:var(--info-bg);border-color:var(--info-line)"></i>Payment submitted</span><span><i style="background:var(--g1);border-color:var(--g5)"></i>Reserved</span><span><i style="background:var(--g7);border-color:var(--g8)"></i>Checked in</span><span><i style="background:repeating-linear-gradient(135deg,var(--g1) 0 4px,#EAF3EC 4px 8px);border-color:var(--g2)"></i>Open Play</span><span><i style="background:#F0EEEA;border-color:#DDD8CE"></i>Completed</span></div>`;
 }
 
 // ---------------------------------------------------------------- Court Rentals
@@ -1666,7 +1666,7 @@ const Setup = {
   step: 0,
   d: { name: "The Paddle Arch", address: "", phone: "", email: "", open: "10:00", close: "02:00", courts: 3, names: ["Court 1", "Court 2", "Court 3"],
     opPrice: 150, opDur: 240, perCourt: 12, sessions: genSessions("10:00", "02:00", 240, 1), dayRate: 350, eveRate: 450, eveStart: "17:00", fee: 50, expiry: 8,
-    gcashName: "", gcashNum: "", bank: "", bankName: "", bankNum: "", instructions: "Send the reservation fee to one of the accounts below, then upload a screenshot of your receipt. Your booking is confirmed once we verify the payment.",
+    gcashName: "", gcashNum: "", bank: "", bankName: "", bankNum: "", instructions: "Send the reservation fee to one of the accounts below, then upload a screenshot of your receipt. Your booking is reserved once we verify the payment.",
     paddle: 100, paddleQty: 20, ball: 30, ballQty: 30, refundH: 72, forfeitH: 24, refundPct: 100, middle: "admin_decides",
     policy: "Cancel 3 or more days before your booking for a refund of your reservation fee. Cancellations less than 24 hours before are not refundable. Between 24 and 72 hours, refunds are at management's discretion.",
     investors: [], demo: true },
