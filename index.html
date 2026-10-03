@@ -514,7 +514,7 @@ function siteShell(inner) {
     <header class="pub-top"><a class="brand-mini" href="#/"><img src="${MONO}" alt=""><b>${esc(PUB.business_name)}</b></a>
       <nav class="row" style="gap:4px"><a class="btn ghost sm" href="#/book">Book</a><a class="btn ghost sm" href="#/find">My booking</a></nav></header>
     <main class="pub-main">${inner}</main>
-    <footer class="foot">${esc(PUB.business_name)}${PUB.address ? ` · ${esc(PUB.address)}` : ""}${PUB.phone ? ` · <span class="mono">${esc(PUB.phone)}</span>` : ""} · Open ${clock(PUB.open_time)} – ${clock(PUB.close_time)} daily · <a href="#/staff">Staff sign-in</a></footer>
+    <footer class="foot">${esc(PUB.business_name)}${PUB.address ? ` · ${esc(PUB.address)}` : ""}${PUB.phone ? ` · <span class="mono">${esc(PUB.phone)}</span>` : ""} · Open ${clock(PUB.open_time)} – ${clock(PUB.close_time)} daily${PUB.reclub_url ? ` · <a href="${esc(PUB.reclub_url)}" target="_blank" rel="noopener">Reclub</a>` : ""} · <a href="#/staff">Staff sign-in</a></footer>
   </div>`;
 }
 const minRate = () => Math.min(...(PUB.rates || []).map((r) => Number(r.rate_per_hour)));
@@ -538,7 +538,7 @@ const Site = {
       <section class="hero">
         <div><p class="eyebrow">Pickleball · ${(PUB.courts_count || 3)} courts</p>
           <h1>Rally, Laugh, Repeat.</h1>
-          <p class="lead">Grab your paddle, bring your friends, and enjoy some time on the court.</p></div>
+          <p class="lead">Grab your paddle, bring your friends, and enjoy some time on the court.</p>${PUB.reclub_url ? `<div class="row" style="margin-top:18px"><a class="btn sec" href="${esc(PUB.reclub_url)}" target="_blank" rel="noopener">${ic("people")} Join us on Reclub</a></div>` : ""}</div>
         <div class="logo-wrap"><img src="${LOGO}" alt="The Paddle Arch"></div>
       </section>
       <section class="grid g2">
@@ -655,7 +655,7 @@ const Flow = {
   },
   shell(inner) {
     const S = Flow.S;
-    if (S.mode === "staff") return `<div class="head"><div><p class="eyebrow">${esc(PUB.business_name)}</p><h1>New ${S.type === "open_play" ? "Open Play booking" : S.type === "court_rental" ? "court rental" : "booking"}</h1><p>Walk-in, phone or Messenger booking. Prices and availability are checked for you.</p></div></div>${inner}`;
+    if (S.mode === "staff") return `<div class="head"><div><p class="eyebrow">${esc(PUB.business_name)}</p><h1>New ${S.type === "open_play" ? "Open Play booking" : S.type === "court_rental" ? "court rental" : "booking"}</h1><p>Walk-in, phone, Messenger or Reclub booking. Prices and availability are checked for you.</p></div></div>${inner}`;
     return siteShell(`<div class="pub-narrow">${inner}</div>`);
   },
   async draw() {
@@ -734,7 +734,7 @@ const Flow = {
     return `<form class="stack" data-f="details">
       ${field("Your name", inp("name", S.name, 'required autocomplete="name" placeholder="e.g. John Dela Cruz"'))}
       ${field("Mobile number (optional)", inp("phone", S.phone, `inputmode="tel" autocomplete="tel" placeholder="0917 123 4567"`), S.mode === "public" ? "Optional — only if you'd like us to be able to reach you." : "Optional")}
-      ${S.mode === "staff" ? field("Booked via", sel("source", [["walk_in", "Walk-in"], ["phone", "Phone / Messenger"]], S.source)) + field("Notes (optional)", inp("notes", S.notes)) : ""}
+      ${S.mode === "staff" ? field("Booked via", sel("source", [["walk_in", "Walk-in"], ["phone", "Phone / Messenger"], ["reclub", "Reclub"]], S.source)) + field("Notes (optional)", inp("notes", S.notes)) : ""}
       <div class="row" style="justify-content:space-between"><button type="button" class="btn ghost" data-a="back">${ic("back")} Back</button><button class="btn">Review ${ic("arrow")}</button></div></form>`;
   },
   async stepReview() {
@@ -965,7 +965,7 @@ const Staff = {
         <dt>Date</dt><dd>${fmtDate(b.business_date, { weekday: "long", month: "long", day: "numeric" })}</dd><dt>Time</dt><dd>${fmtRange(b.starts_at, b.ends_at)}</dd>
         <dt>${b.booking_type === "open_play" ? "Session" : "Courts"}</dt><dd>${what}</dd>
         ${b.booking_type === "open_play" && b.players_checked_in != null ? `<dt>Checked in</dt><dd>${b.players_checked_in} of ${b.player_count}</dd>` : ""}
-        <dt>Booked</dt><dd style="font-weight:500">${fmtDT(b.created_at)} · ${esc({ online: "online by customer", walk_in: "walk-in", phone: "phone / Messenger", admin: "admin" }[b.source] || b.source)}${b.created_by_name ? ` (${esc(b.created_by_name)})` : ""}</dd>
+        <dt>Booked</dt><dd style="font-weight:500">${fmtDT(b.created_at)} · ${esc({ online: "online by customer", walk_in: "walk-in", phone: "phone / Messenger", reclub: "Reclub", admin: "admin" }[b.source] || b.source)}${b.created_by_name ? ` (${esc(b.created_by_name)})` : ""}</dd>
         ${b.notes ? `<dt>Notes</dt><dd style="font-weight:500">${esc(b.notes)}</dd>` : ""}</dl></div>
       ${Staff.msgLine(b)}
       <div class="card"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd><dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd><dt>Paid (confirmed)</dt><dd>${peso(b.amount_paid)}</dd>
@@ -1028,15 +1028,16 @@ async function loadMethods() { if (!Staff.methods) Staff.methods = await q(sb.fr
 function bookingRows(list) {
   if (!list.length) return `<p class="empty">No bookings.</p>`;
   return `<div class="scroll-x"><table class="t"><thead><tr><th>Reference</th><th>Customer</th><th>Date</th><th>Time</th><th>What</th><th>Status</th><th class="r">Total</th><th class="r">Balance</th></tr></thead><tbody>
-    ${list.map((b) => `<tr class="click" data-a="open" data-id="${b.id}"><td class="ref">${esc(b.reference)}${b.review_pending ? ` <span class="tag" style="background:var(--info-bg);color:var(--info)">REVIEW</span>` : ""}</td><td>${esc(b.customer_name)}${b.source === "online" ? ` <span class="muted" style="font-size:12px">online</span>` : ""}</td><td>${fmtDate(b.business_date)}</td><td class="num">${fmtRange(b.starts_at, b.ends_at)}</td>
+    ${list.map((b) => `<tr class="click" data-a="open" data-id="${b.id}"><td class="ref">${esc(b.reference)}${b.review_pending ? ` <span class="tag" style="background:var(--info-bg);color:var(--info)">REVIEW</span>` : ""}</td><td>${esc(b.customer_name)}${b.source === "online" || b.source === "reclub" ? ` <span class="muted" style="font-size:12px">${b.source === "reclub" ? "Reclub" : "online"}</span>` : ""}</td><td>${fmtDate(b.business_date)}</td><td class="num">${fmtRange(b.starts_at, b.ends_at)}</td>
     <td>${b.booking_type === "open_play" ? `Open Play · ${b.player_count}p` : esc(b.lines.map((l) => l.court).join(", "))}</td><td>${statusPill(b.status)}</td><td class="r num">${peso(b.total_amount)}</td><td class="r num">${["cancelled", "expired"].includes(b.status) ? "—" : peso(b.balance_due)}</td></tr>`).join("")}</tbody></table></div>`;
 }
 const openBookingAct = (el) => Staff.openBooking(el.dataset.id);
 
 // ---------------------------------------------------------------- Dashboard
 Views.dashboard = async (root) => {
-  const d = await rpc("staff_dashboard");
+  const [d, queue] = await Promise.all([rpc("staff_dashboard"), rpc("staff_payment_queue")]);
   await loadMethods();
+  const toCheck = queue.length;
   Staff.refreshPage = () => Views.dashboard(root);
   const day = Staff.can("schedule.view") || Staff.can("bookings.view") ? await rpc("staff_day", { p_date: d.date }) : null;
   const rev = d.revenue, totalRev = rev ? sum(Object.values(rev)) : 0, maxB = rev ? Math.max(1, ...Object.values(rev).map(Number)) : 1;
@@ -1047,19 +1048,47 @@ Views.dashboard = async (root) => {
     ${rev ? `<div class="card stat"><div class="l">Today's revenue</div><div class="v num">${peso(totalRev)}</div><div class="d">Collected ${peso(d.collected)}</div></div>` : ""}
     <div class="card stat"><div class="l">Today's bookings</div><div class="v num">${d.bookings.total}</div><div class="d">${d.bookings.court_rentals} court rental${d.bookings.court_rentals === 1 ? "" : "s"} · ${d.bookings.open_play_players} Open Play players</div></div>
     <div class="card stat"><div class="l">Courts in use now</div><div class="v num">${d.occupied_now}<small>/ ${d.courts_active}</small></div><div class="d">${fmtT(d.now)}</div></div>
-    <div class="card stat ${d.to_review.length + d.awaiting_payment ? "warn" : ""}"><div class="l">Pending payments</div><div class="v num">${d.to_review.length + d.awaiting_payment}</div><div class="d">${d.to_review.length} to review · ${d.awaiting_payment} not yet paid</div></div>
+    <div class="card stat ${toCheck + d.awaiting_payment ? "warn" : ""}"><div class="l">Pending payments</div><div class="v num">${toCheck + d.awaiting_payment}</div><div class="d">${toCheck} to review · ${d.awaiting_payment} not yet paid</div></div>
     <div class="card stat ${d.low_stock.length ? "warn" : ""}"><div class="l">Low stock</div><div class="v num">${d.low_stock.length}</div><div class="d">${esc(d.low_stock.slice(0, 2).map((x) => x.name.replace(" [DEMO]", "")).join(", ") || "All stocked")}</div></div>
   </div>
-  ${d.to_review.length ? `<div class="card" style="margin-top:14px"><h2>Payments to review</h2><div class="scroll-x"><table class="t"><thead><tr><th>Reference</th><th>Customer</th><th>Type</th><th>Play date</th><th class="r">Amount</th><th>Method</th><th>Sent</th></tr></thead><tbody>
-    ${d.to_review.map((x) => `<tr class="click" data-a="open" data-id="${x.booking_id}"><td class="ref">${esc(x.reference)}</td><td>${esc(x.customer)}</td><td>${x.type === "open_play" ? "Open Play" : "Court Rental"}</td><td>${fmtDate(x.business_date)}</td><td class="r num">${peso(x.amount)}</td><td>${esc(x.method || "")}${x.reference_no ? ` <span class="mono muted">${esc(x.reference_no)}</span>` : ""}</td><td>${relTime(x.submitted_at)}</td></tr>`).join("")}</tbody></table></div></div>` : ""}
+  ${payQueueHTML(queue)}
   ${day ? `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Today's courts</h2><a class="btn ghost sm" href="#/staff/courts">Court rentals ${ic("arrow")}</a></div>${schedGrid(day, true)}</div>` : ""}
   <div class="grid g2" style="margin-top:14px">
     <div class="card"><h2>Booking summary</h2><dl class="kv num">${["pending_payment", "payment_submitted", "confirmed", "checked_in", "completed", "cancelled", "no_show"].map((s) => `<dt>${STATUS_LABEL[s]}</dt><dd>${d.bookings[s]}</dd>`).join("")}</dl></div>
     <div class="card"><h2>Recent transactions</h2>${d.recent.length ? `<div class="stack" style="gap:9px">${d.recent.slice(0, 8).map((t) => `<div class="row" style="flex-wrap:nowrap;${t.booking_id ? "cursor:pointer" : ""}" ${t.booking_id ? `data-a="open" data-id="${t.booking_id}"` : ""}><div style="flex:1;min-width:0"><b>${esc(t.what)}</b><div class="muted" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.detail || "")}</div></div><div style="text-align:right"><b class="num">${t.voided ? "Voided" : peso(t.amount)}</b><div class="muted" style="font-size:12px">${esc(t.method || "")} · ${fmtT(t.at)}</div></div></div>`).join("")}</div>` : `<p class="empty">No sales or payments yet today.</p>`}</div>
   </div>
   ${rev ? `<div class="card" style="margin-top:14px"><h2>Revenue breakdown · today</h2>${Object.keys(BUCKET_LABEL).map((k) => `<div style="display:grid;grid-template-columns:120px 1fr 90px;gap:10px;align-items:center;margin:6px 0"><span class="muted">${BUCKET_LABEL[k]}</span><div class="bar"><i style="width:${((rev[k] || 0) / maxB) * 100}%"></i></div><b class="num" style="text-align:right">${peso(rev[k] || 0)}</b></div>`).join("")}<p class="muted" style="font-size:12.5px;margin-top:8px">Bookings count on the day they're played, at full price. The reservation fee isn't counted twice.</p></div>` : ""}`;
-  wire(root, { open: openBookingAct });
+  wire(root, { open: openBookingAct, posck: (el) => openPosCheck(queue.find((x) => x.id === el.dataset.id), () => Views.dashboard(root)) });
 };
+
+// One list for every payment that needs a manager's eye: customer payment proofs (Open Play / Court Rental) and non-cash POS sales
+const QTYPE = { open_play: "Open Play", court_rental: "Court Rental", pos: "POS sale" };
+function payQueueHTML(queue) {
+  if (!queue.length) return `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Payments to review</h2><span class="muted" style="font-size:13.5px">${ic("check")} All caught up</span></div></div>`;
+  const can = Staff.can("bookings.verify_payment");
+  const pill = (x) => x.status === "problem" ? `<span class="pill st-cancelled">Problem</span>` : x.kind === "pos" ? `<span class="pill st-pending_payment">Check GCash / bank</span>` : `<span class="pill st-payment_submitted">Proof sent</span>`;
+  return `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Payments to review <span class="muted num" style="font-size:15px">(${queue.length})</span></h2><span class="muted" style="font-size:13px">Open Play, court rentals and POS — oldest first</span></div>
+    ${can ? "" : `<p class="muted" style="font-size:13px;margin:0 0 6px">A manager confirms these.</p>`}
+    <div class="scroll-x"><table class="t"><thead><tr><th>Reference</th><th>Type</th><th>Customer</th><th>Details</th><th class="r">Amount</th><th>Method</th><th>Sent</th><th></th></tr></thead><tbody>
+    ${queue.map((x) => `<tr class="click" ${x.kind === "pos" ? `data-a="posck" data-id="${x.id}"` : `data-a="open" data-id="${x.booking_id}"`}><td class="ref">${esc(x.reference)}</td><td>${QTYPE[x.type] || ""}</td><td>${esc(x.customer || "—")}</td>
+      <td class="muted" style="font-size:13px;max-width:240px">${x.kind === "pos" ? esc(x.detail || "") : `${esc(x.detail || "")} · ${fmtDate(x.date)}`}${x.note ? `<br><span style="color:var(--bad)">${esc(x.note)}</span>` : ""}</td>
+      <td class="r num">${peso(x.amount)}</td><td>${esc(x.method || "")}${x.reference_no ? ` <span class="mono muted">${esc(x.reference_no)}</span>` : ""}</td><td>${relTime(x.sent_at)}</td><td>${pill(x)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+function openPosCheck(x, after) {
+  if (!x) return;
+  const can = Staff.can("bookings.verify_payment");
+  openModal({ center: true, render: () => `${mhead(`Sale ${esc(x.reference)}`, "POS payment")}
+    <dl class="kv num"><dt>Amount</dt><dd><b>${peso(x.amount)}</b></dd><dt>Paid via</dt><dd>${esc(x.method || "")}</dd><dt>Reference no.</dt><dd class="mono">${esc(x.reference_no || "— none entered —")}</dd><dt>Sold</dt><dd>${fmtDT(x.sent_at)}</dd>${x.customer ? `<dt>Customer</dt><dd>${esc(x.customer)}</dd>` : ""}<dt>Items</dt><dd style="font-weight:500">${esc(x.detail || "")}</dd></dl>
+    ${x.note ? notice(`Flagged: ${esc(x.note)}`, "warn") : ""}
+    ${can ? `<p class="muted" style="font-size:13px">Check your GCash or bank app that this amount arrived, then confirm.</p>
+      <div class="row"><button type="button" class="btn" data-a="okp">${ic("check")} Money received</button></div>
+      <div class="divider"></div>
+      <form class="stack" data-f="prob">${field("Something wrong?", inp("note", "", 'required placeholder="e.g. Not in GCash, amount short"'))}<div class="row"><button class="btn sec">Flag problem</button></div></form>` : `<p class="muted">A manager confirms this payment.</p>`}`,
+    bind: (m) => {
+      const go = async (ok, note) => { const r = await run(() => rpc("confirm_pos_payment", { p_sale_id: x.id, p_ok: ok, p_note: note }), ok ? "Payment confirmed." : "Flagged — it stays on the list until it's sorted."); if (r) { closeModal(); after && after(); } };
+      wire(m, { okp: () => go(true, null), prob: (f, d) => go(false, d.note) });
+    } });
+}
 
 // Court × time grid built from staff_day()
 function schedGrid(day, compact = false) {
@@ -1181,7 +1210,7 @@ Views.pos = async (root) => {
           ${lines.length ? `<button type="button" class="btn ghost block" data-a="clear">Clear</button>` : ""}
         </form></aside></div>
       ${sales.length ? `<div class="card" style="margin-top:16px"><h2>Today's sales</h2><div class="scroll-x"><table class="t"><thead><tr><th>Sale</th><th>Time</th><th>Items</th><th>Customer</th><th>Payment</th><th class="r">Total</th><th></th></tr></thead><tbody>
-        ${sales.map((s) => `<tr><td class="ref">${esc(s.sale_no)}</td><td>${fmtT(s.sold_at)}</td><td>${esc(s.items.map((i) => `${i.qty}× ${i.name}`).join(", "))}</td><td>${esc(s.customer || "—")}${s.booking ? ` <span class="mono muted">${esc(s.booking)}</span>` : ""}</td><td>${esc(s.method || "")}</td><td class="r num">${s.status === "voided" ? `<s>${peso(s.total)}</s> <span class="tag">VOID</span>` : peso(s.total)}</td><td>${Staff.can("pos.void") && s.status === "completed" ? `<button type="button" class="btn ghost sm" data-a="void" data-id="${s.id}">Void</button>` : ""}</td></tr>`).join("")}</tbody></table></div></div>` : ""}`;
+        ${sales.map((s) => `<tr><td class="ref">${esc(s.sale_no)}</td><td>${fmtT(s.sold_at)}</td><td>${esc(s.items.map((i) => `${i.qty}× ${i.name}`).join(", "))}</td><td>${esc(s.customer || "—")}${s.booking ? ` <span class="mono muted">${esc(s.booking)}</span>` : ""}</td><td>${esc(s.method || "")}${s.status === "completed" && s.pay_check === "to_check" ? ` <span class="tag" style="background:var(--warn-bg);color:var(--warn)">TO CHECK</span>` : s.status === "completed" && s.pay_check === "problem" ? ` <span class="tag" style="background:var(--bad);color:#fff">PROBLEM</span>` : s.pay_check === "confirmed" ? ` <span class="muted" style="font-size:12px">✓ checked</span>` : ""}</td><td class="r num">${s.status === "voided" ? `<s>${peso(s.total)}</s> <span class="tag">VOID</span>` : peso(s.total)}</td><td>${Staff.can("pos.void") && s.status === "completed" ? `<button type="button" class="btn ghost sm" data-a="void" data-id="${s.id}">Void</button>` : ""}</td></tr>`).join("")}</tbody></table></div></div>` : ""}`;
     const form = root.querySelector("[data-f=sale]");
     // Update totals in place while typing (a full redraw here would swallow the tap on "Complete sale")
     form.addEventListener("input", (e) => {
@@ -1408,17 +1437,25 @@ Views.reports = async (root, params) => {
       <div class="card"><table class="t"><tbody>${[["Salaries", "salaries"], ["Rent", "rent"], ["Utilities", "utilities"], ["Repairs", "repairs"], ["Construction", "construction"], ["Equipment", "equipment"], ["Marketing", "marketing"], ["Supplies", "supplies"], ["Insurance", "insurance"], ["Professional fees", "professional_fees"], ["Other", "other"]].map(([l, g]) => `<tr><td>${l}</td><td class="r num">${peso(grp(g))}</td></tr>`).join("")}</tbody></table></div>`;
     exportRows = [["Date", "Category", "Type", "Description", "Vendor", "Amount"], ...ex.map((e) => [e.expense_date, cats.find((c) => c.id === e.category_id)?.name, e.expense_type, e.description, e.vendor, e.amount])];
   } else if (tab === "pnl") {
-    const d = await rpc("report_pnl", { p_from: from, p_to: to });
+    const [d, st] = await Promise.all([rpc("report_pnl", { p_from: from, p_to: to }), rpc("report_stock", { p_from: from, p_to: to })]);
+    const WO = { damaged: "Damaged", lost: "Lost", adjustment: "Stock count corrections", other: "Other write-offs" };
     const line = (l, v, strong) => `<tr><td style="${strong ? "font-weight:800" : "padding-left:22px"}">${l}</td><td class="r num" style="${strong ? "font-weight:800" : ""}">${peso(v)}</td></tr>`;
     const secH = (x) => `<tr><td colspan="2" style="padding-top:18px"><span class="eyebrow">${x}</span></td></tr>`;
     body = `<div class="card pad-lg" style="max-width:720px"><h2>Profit & Loss</h2><table class="t"><tbody>
       ${secH("Revenue")}${Object.entries(d.revenue).map(([k, v]) => line(BUCKET_LABEL[k] || k, v)).join("") || line("No revenue", 0)}${line("Total revenue", d.total_revenue, true)}
-      ${secH("Cost of sales")}${line("Items sold (weighted-average cost)", d.cogs)}${line("Gross profit", d.gross_profit, true)}
+      ${secH("Cost of sales")}${line("Items sold (weighted-average cost)", d.cogs)}${Number(d.stock_written_off) ? line("Stock written off (damaged, lost, count corrections)", d.stock_written_off) : ""}${line("Gross profit", d.gross_profit, true)}
       ${secH("Operating expenses")}${d.operating_expenses.map((x) => line(esc(x.category), x.amount)).join("") || line("None", 0)}${line("Total operating expenses", d.total_operating_expenses, true)}
       <tr><td style="font-weight:800;font-size:18px;padding-top:14px">Net profit</td><td class="r num" style="font-weight:800;font-size:22px;font-family:var(--display);padding-top:14px;color:${d.net_profit < 0 ? "var(--bad)" : "var(--g7)"}">${peso(d.net_profit)}</td></tr>
       ${secH("Capital expenses (not in net profit)")}${d.capital_expenses.map((x) => line(esc(x.category), x.amount)).join("") || line("None", 0)}${line("Net after capital expenses", d.net_after_capex, true)}
-      </tbody></table><p class="muted" style="font-size:13px;margin-top:12px">Stock purchases (${peso(d.inventory_purchases_excluded)}) aren't deducted here — only the cost of items actually sold is.</p></div>`;
-    exportRows = [["Line", "Amount"], ...Object.entries(d.revenue).map(([k, v]) => [`Revenue: ${BUCKET_LABEL[k] || k}`, v]), ["Total revenue", d.total_revenue], ["Cost of goods sold", d.cogs], ["Gross profit", d.gross_profit], ...d.operating_expenses.map((x) => [`Expense: ${x.category}`, x.amount]), ["Total operating expenses", d.total_operating_expenses], ["Net profit", d.net_profit], ...d.capital_expenses.map((x) => [`Capital: ${x.category}`, x.amount]), ["Net after capital expenses", d.net_after_capex]];
+      </tbody></table><p class="muted" style="font-size:13px;margin-top:12px">Stock you buy isn't an expense yet — it sits on the shelf as stock (an asset). It becomes a cost only when it's sold, damaged or lost. See where your stock purchases went below.</p></div>
+      <div class="card pad-lg" style="max-width:720px;margin-top:14px"><h2>Stock value</h2><p class="muted" style="margin-top:-6px;font-size:13.5px">What happened to the money tied up in snacks and drinks this period (at weighted-average cost).</p><table class="t"><tbody>
+      ${line("Stock value at start", st.opening_value, true)}
+      ${line("+ Stock purchased", st.purchases)}${Number(st.added_by_adjustment) ? line("+ Stock added (opening stock, items found)", st.added_by_adjustment) : ""}
+      ${line("− Sold (cost of sales)", -st.cost_of_sold)}${st.written_off_lines.map((w) => line(`− ${WO[w.type] || w.type}`, -w.amount)).join("")}
+      ${Math.abs(Number(st.rounding)) >= 1 ? line("Rounding", st.rounding) : ""}
+      ${line("Stock value at end", st.closing_value, true)}
+      </tbody></table><p class="muted" style="font-size:13px;margin-top:12px">Stock purchases are paid in cash (see Payment summary and Purchases) but only reach profit as they're used up. Your accountant will want the end value for the balance sheet.</p></div>`;
+    exportRows = [["Line", "Amount"], ...Object.entries(d.revenue).map(([k, v]) => [`Revenue: ${BUCKET_LABEL[k] || k}`, v]), ["Total revenue", d.total_revenue], ["Cost of goods sold", d.cogs], ["Stock written off", d.stock_written_off || 0], ["Gross profit", d.gross_profit], ...d.operating_expenses.map((x) => [`Expense: ${x.category}`, x.amount]), ["Total operating expenses", d.total_operating_expenses], ["Net profit", d.net_profit], ...d.capital_expenses.map((x) => [`Capital: ${x.category}`, x.amount]), ["Net after capital expenses", d.net_after_capex], [], ["Stock value at start", st.opening_value], ["Stock purchased", st.purchases], ["Stock added by adjustment", st.added_by_adjustment], ["Sold (cost)", -st.cost_of_sold], ["Written off", -st.written_off], ["Rounding", st.rounding], ["Stock value at end", st.closing_value]];
   } else {
     const [rows, methods] = await Promise.all([rpc("report_collections", { p_from: from, p_to: to }), loadMethods()]);
     const dates = [...new Set(rows.map((r) => r.business_date))].sort().reverse();
@@ -1548,7 +1585,7 @@ Views.settings = async (root, params) => {
   let body = "", data = {};
   if (tab === "business") body = `<form class="card pad-lg stack" data-f="settings"><div class="grid g2">
     ${field("Business name", inp("business_name", s.business_name, "required"))}${field("Phone / mobile", inp("phone", s.phone || ""))}${field("Address", inp("address", s.address || ""))}${field("Email", inp("email", s.email || "", 'type="email"'))}
-    ${field("Facebook page", inp("facebook_url", s.facebook_url || "", 'type="url"'))}${field("Instagram", inp("instagram_url", s.instagram_url || "", 'type="url"'))}
+    ${field("Facebook page", inp("facebook_url", s.facebook_url || "", 'type="url"'))}${field("Instagram", inp("instagram_url", s.instagram_url || "", 'type="url"'))}${field("Reclub club page", inp("reclub_url", s.reclub_url || "", 'type="url" placeholder="https://reclub.co/clubs/@..."'), "Shows a “Join us on Reclub” button on your website. Leave empty to hide it.")}
     ${field("Opens at", tm("open_time", s.open_time, "required"))}${field("Closes at", tm("close_time", s.close_time, "required"), "Earlier than opening means after midnight.")}
     ${field("Business day rolls over at", tm("day_rollover_time", s.day_rollover_time, "required"), "Sales before this time count toward the previous night.")}${field("Booking reference prefix", inp("booking_ref_prefix", s.booking_ref_prefix, 'maxlength="6" pattern="[A-Za-z0-9]{1,6}" required'), `e.g. ${esc(s.booking_ref_prefix)}-20260928-0001`)}
     </div>${save}</form>`;
@@ -1629,6 +1666,7 @@ Views.settings = async (root, params) => {
         else patch[el.name] = el.value.trim() === "" ? null : el.value.trim();
       }
       if (patch.booking_ref_prefix) patch.booking_ref_prefix = patch.booking_ref_prefix.toUpperCase();
+      if (patch.reclub_url) patch.reclub_url = patch.reclub_url.replace(/[?#].*$/, "");
       if (patch.messenger_page_username) patch.messenger_page_username = patch.messenger_page_username.replace(/^https?:\/\/(www\.|m\.|web\.)?(facebook\.com|m\.me)\//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
       if ("messenger_reserved_text" in patch && !patch.messenger_reserved_text) delete patch.messenger_reserved_text;
       void fd;
