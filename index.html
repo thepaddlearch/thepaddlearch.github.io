@@ -551,6 +551,8 @@ function tilePrice(date, off, mins = 60) {
   return round2(t);
 }
 const addonList = () => (PUB.addons_enabled === false ? [] : PUB.equipment || []);
+// how many of each item are free for the booking's time (null = not checked yet)
+const addonFree = (e) => (Flow.S?.addonFree && e.id in Flow.S.addonFree ? Flow.S.addonFree[e.id] : null);
 const addonTotal = (picked) => sum(addonList(), (e) => (picked?.[e.id] || 0) * Number(e.rental_price));
 const addonArgs = (picked) => Object.entries(picked || {}).filter(([, n]) => n > 0).map(([id, n]) => ({ equipment_id: id, quantity: n }));
 
@@ -785,7 +787,9 @@ const Flow = {
       ${op && rc ? `<div class="f">Are you on Reclub?${staff ? " (optional)" : ""}<div class="yn"><button type="button" class="choice" data-a="reclub" data-v="1" aria-pressed="${S.reclub === true}"><b>Yes, I'm on Reclub</b></button><button type="button" class="choice" data-a="reclub" data-v="0" aria-pressed="${S.reclub === false}"><b>No, not yet</b></button></div></div>` : ""}
       ${op && rc && S.reclub === true ? notice(`Great! Please join our club on Reclub and add the names of your other players there. <a href="${esc(rc)}" target="_blank" rel="noopener"><b>Open our Reclub page</b></a>`) : ""}
       ${showNames ? `<div class="f">Player names${staff ? " (optional)" : ""}<div class="grid g2">${names.map((n, i) => `<input class="in" name="pn_${i}" value="${esc(n)}" placeholder="Player ${i + 1}" maxlength="100" aria-label="Player ${i + 1} name" ${staff ? "" : "required"}>`).join("")}</div>${staff ? "" : `<small>Please type the name of everyone playing. We'll add your group to our Reclub list for you.</small>`}</div>` : ""}
-      ${eq.length ? `<div class="f">Add-ons (optional)<div class="sub" style="padding:2px 14px">${eq.map((e) => `<div class="addon"><div><b>${esc(e.name)} rental</b><div class="muted" style="font-size:13px">${peso(e.rental_price)} each</div></div><div class="qty"><button type="button" data-a="addon" data-id="${e.id}" data-d="-1" aria-label="Fewer ${esc(e.name)}s">−</button><span class="num">${S.addons[e.id] || 0}</span><button type="button" data-a="addon" data-id="${e.id}" data-d="1" aria-label="More ${esc(e.name)}s">+</button></div></div>`).join("")}</div><small>Not required. Pick them up at the counter when you arrive.</small></div>` : ""}
+      ${eq.length ? `<div class="f">Add-ons (optional)<div class="sub" style="padding:2px 14px">${eq.map((e) => { const free = addonFree(e), none = free !== null && free <= 0, n = S.addons[e.id] || 0;
+        return `<div class="addon"><div><b>${esc(e.name)} rental</b><div class="muted" style="font-size:13px">${peso(e.rental_price)} each · ${free === null ? "" : none ? `<b style="color:var(--bad)">none free for your time</b>` : `<b style="color:var(--g7)">${free} available</b> for your time`}</div></div>
+        <div class="qty"><button type="button" data-a="addon" data-id="${e.id}" data-d="-1" aria-label="Fewer ${esc(e.name)}s" ${n ? "" : "disabled"}>−</button><span class="num">${n}</span><button type="button" data-a="addon" data-id="${e.id}" data-d="1" aria-label="More ${esc(e.name)}s" ${none || (free !== null && n >= free) ? "disabled" : ""}>+</button></div></div>`; }).join("")}</div><small>Not required. Pick them up at the counter when you arrive.</small></div>` : ""}
       ${staff ? field("Booked via", sel("source", [["walk_in", "Walk-in"], ["phone", "Phone / Messenger"], ["reclub", "Reclub"]], S.source)) + field("Notes (optional)", inp("notes", S.notes)) : ""}
       <div class="row" style="justify-content:space-between"><button type="button" class="btn ghost" data-a="back">${ic("back")} Back</button><button class="btn">Review ${ic("arrow")}</button></div></form>`;
   },
@@ -819,12 +823,20 @@ const Flow = {
       hour: (el) => { const m = Number(el.dataset.m), l = S.sel[S.court] || []; S.sel[S.court] = l.includes(m) ? l.filter((x) => x !== m) : [...l, m]; Flow.draw(); },
       clear: () => { S.sel = {}; Flow.draw(); },
       reclub: (el) => { Flow.keep(); S.reclub = el.dataset.v === "1"; Flow.draw(); },
-      addon: (el) => { Flow.keep(); const e = addonList().find((x) => x.id === el.dataset.id); if (!e) return; S.addons[e.id] = Math.min(Number(e.max) || 20, Math.max(0, (S.addons[e.id] || 0) + Number(el.dataset.d))); Flow.draw(); },
+      addon: (el) => { Flow.keep(); const e = addonList().find((x) => x.id === el.dataset.id); if (!e) return; const free = addonFree(e); S.addons[e.id] = Math.min(free === null ? (Number(e.max) || 20) : Math.min(20, free), Math.max(0, (S.addons[e.id] || 0) + Number(el.dataset.d))); Flow.draw(); },
       next: async (el) => {
         if (S.type === "court_rental") {
           el.disabled = true;
           try { Flow.quote = await rpc("quote_court_rental", { p_items: S.items.map((x) => ({ court_id: x.court_id, starts_at: offISO(S.date, x.s), ends_at: offISO(S.date, x.e) })) }); }
           catch (e) { el.disabled = false; return toast(friendly(e), true); }
+        }
+        // check how many paddles / balls are free for this time
+        const win = S.type === "open_play" ? (() => { const x = Flow.sessions.find((v) => v.id === S.session); return x ? [x.starts_at, x.ends_at] : null; })()
+          : S.items.length ? [offISO(S.date, Math.min(...S.items.map((x) => x.s))), offISO(S.date, Math.max(...S.items.map((x) => x.e)))] : null;
+        S.addonFree = null;
+        if (win && addonList().length) {
+          try { S.addonFree = Object.fromEntries((await rpc("get_addon_availability", { p_starts: win[0], p_ends: win[1] })).map((x) => [x.id, Number(x.free)])); } catch (_) { S.addonFree = null; }
+          if (S.addonFree) for (const id of Object.keys(S.addons)) S.addons[id] = Math.min(S.addons[id], Math.max(0, S.addonFree[id] ?? 0));
         }
         S.step = 2; Flow.error = ""; Flow.draw(); window.scrollTo({ top: 0 });
       },
@@ -853,6 +865,7 @@ const Flow = {
         } catch (e) {
           Flow.error = friendly(e);
           if (/no longer available|SOLD OUT|remaining|passed|closed/i.test(Flow.error)) { S.step = 1; Flow.avail = null; toast(Flow.error, true); }
+          else if (/free for that time|are free/i.test(Flow.error)) { S.step = 2; S.addonFree = null; toast(Flow.error + " Please change your add-ons.", true); }
           Flow.draw();
         }
       },
@@ -1429,16 +1442,53 @@ Views.pos = async (root) => {
 
 // ---------------------------------------------------------------- Equipment rentals
 Views.equipment = async (root) => {
-  const [equipment, rentals] = await Promise.all([q(sb.from("equipment").select("*").order("name")), rpc("staff_rentals", { p_days: 14 })]);
+  const [equipment, rentals, held] = await Promise.all([q(sb.from("equipment").select("*").order("name")), rpc("staff_rentals", { p_days: 14 }), rpc("staff_equipment_held").catch(() => ({}))]);
   const out = rentals.filter((r) => ["out", "partial"].includes(r.status)), done = rentals.filter((r) => !["out", "partial"].includes(r.status));
-  root.innerHTML = `${pageHead("Equipment Rentals", "Rent paddles and balls through the POS. Record returns here: good, damaged or lost.", `<a class="btn" href="#/staff/pos">${ic("pos")} Rent via POS</a>`)}
+  root.innerHTML = `${pageHead("Equipment Rentals", "Rent paddles and balls through the POS. Record returns here: good, damaged or lost.", `${Staff.can("equipment.manage") ? `<button type="button" class="btn sec" data-a="buy">${ic("plus")} Record purchase</button>` : ""}<a class="btn" href="#/staff/pos">${ic("pos")} Rent via POS</a>`)}
     <div class="grid g2">${equipment.map((e) => `<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${esc(e.name)}s</h2><b class="num">${peso(e.rental_price)} / rental</b></div>
       <div class="grid g5" style="margin-top:12px;gap:8px">${[["Total", e.total_qty], ["Available", e.available_qty], ["Rented", e.rented_qty], ["Damaged", e.damaged_qty], ["Lost", e.lost_qty]].map(([l, v]) => `<div><div class="muted" style="font-size:12px">${l}</div><div class="num" style="font-family:var(--display);font-size:24px">${v}</div></div>`).join("")}</div>
+      ${held[e.id]?.today ? `<p class="muted" style="font-size:13px;margin:8px 0 0">${ic("bookings")} <b style="color:var(--ink)">${held[e.id].today}</b> booked as add-ons today${held[e.id].now ? ` · <b style="color:var(--warn)">${held[e.id].now} for groups playing now or within the hour</b> (kept aside — not rentable at the POS)` : ""}</p>` : ""}
+      ${Staff.can("equipment.manage") ? `<div class="row" style="margin-top:10px"><button type="button" class="btn sec sm" data-a="count" data-id="${e.id}">Set how many we own</button></div>` : ""}
       ${Staff.can("equipment.manage") ? `<form class="row" data-f="adj" data-id="${e.id}" style="margin-top:12px">${sel("action", [["add_stock", "Add new stock"], ["remove_stock", "Remove from stock"], ["repaired", "Damaged → repaired"], ["written_off", "Write off damaged"], ["found", "Lost → found"]], "add_stock", 'style="width:auto"')}<input class="in num" type="number" min="1" name="qty" value="1" style="width:80px" aria-label="Quantity"><button class="btn sec sm">Apply</button></form>` : ""}</div>`).join("")}</div>
     <div class="card" style="margin-top:14px"><h2>Out now (${out.length})</h2>${out.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Customer</th><th>Item</th><th class="r">Out</th><th>Since</th><th>Booking</th><th class="r">Fee</th><th></th></tr></thead><tbody>${out.map((r) => `<tr><td>${esc(r.customer)}</td><td>${esc(r.item)}</td><td class="r num">${r.quantity - r.returned - r.damaged - r.lost} / ${r.quantity}</td><td>${fmtDT(r.rented_at)}</td><td class="mono">${esc(r.booking || "—")}</td><td class="r num">${peso(r.fee)}</td><td><button type="button" class="btn sm" data-a="ret" data-id="${r.id}">Return</button></td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">Nothing is out right now.</p>`}</div>
     <div class="card" style="margin-top:14px"><h2>Recent (14 days)</h2>${done.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Customer</th><th>Item</th><th class="r">Qty</th><th>Rented</th><th>Returned</th><th>Condition</th><th>Staff</th></tr></thead><tbody>${done.map((r) => `<tr><td>${esc(r.customer)}</td><td>${esc(r.item)}</td><td class="r num">${r.quantity}</td><td>${fmtDT(r.rented_at)}</td><td>${r.status === "cancelled" ? "Sale voided" : fmtDT(r.returned_at)}</td><td>${r.returned} good${r.damaged ? `, <b style="color:var(--warn)">${r.damaged} damaged</b>` : ""}${r.lost ? `, <b style="color:var(--bad)">${r.lost} lost</b>` : ""}${r.notes ? ` — ${esc(r.notes)}` : ""}</td><td>${esc(r.by || "")}</td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">No returns yet.</p>`}</div>`;
   wire(root, {
     adj: async (f, d) => { const ok = await run(() => rpc("adjust_equipment", { p_equipment_id: f.dataset.id, p_action: d.action, p_quantity: Number(d.qty), p_notes: null }), "Equipment updated."); if (ok) Views.equipment(root); },
+    buy: async () => {
+      const [cats, methods] = await Promise.all([q(sb.from("expense_categories").select("*").order("sort_order")), loadMethods()]);
+      const usable = cats.filter((c) => c.is_active), def = usable.find((c) => /^equipment/i.test(c.name)) || usable[0];
+      openModal({ render: () => `${mhead("Record equipment purchase", "New paddles or balls")}<form class="stack" data-f="buy">
+        <div class="grid g2">${field("Item", sel("equipment_id", equipment.filter((e) => e.is_active).map((e) => [e.id, e.name]), equipment[0]?.id))}${field("Date bought", `<input class="in" type="date" name="date" value="${PUB.today}" required>`)}</div>
+        <div class="grid g2">${field("How many", `<input class="in num" type="number" name="qty" min="1" max="1000" value="1" required id="bqty">`)}${field("Cost per piece", money("unit_cost", "", 'required'), "₱0 if it was free or donated.")}</div>
+        <p style="margin:0">Total: <b class="num" id="btotal">₱0</b></p>
+        <div class="grid g2">${field("Supplier (optional)", inp("vendor", "", 'maxlength="120"'))}${field("Paid via", sel("method", methods.filter((m) => m.is_active).map((m) => [m.id, m.name])))}</div>
+        <div class="grid g2">${field("Expense category", `<select class="in" name="category_id" id="bcat">${usable.map((c) => `<option value="${c.id}" data-type="${c.default_type}" ${c.id === def?.id ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select>`)}${field("Expense type", sel("expense_type", [["capital", "Capital (equipment that lasts)"], ["operating", "Operating (everyday supplies)"]], def?.default_type === "operating" ? "operating" : "capital", 'id="btype"'), "Capital is shown separately in the P&L.")}</div>
+        ${receiptField()}${field("Notes (optional)", inp("notes", ""))}
+        <p class="muted" style="font-size:13px;margin:0">Saving adds them to the equipment count and records the cost in Expenses.</p>
+        <button class="btn">Save purchase</button></form>`,
+        bind: (m) => {
+          const tot = () => { m.querySelector("#btotal").textContent = peso((Number(m.querySelector("#bqty").value) || 0) * (Number(m.querySelector("[name=unit_cost]").value) || 0)); };
+          m.querySelector("#bqty").addEventListener("input", tot); m.querySelector("[name=unit_cost]").addEventListener("input", tot);
+          m.querySelector("#bcat").addEventListener("change", () => { const t = m.querySelector("#bcat").selectedOptions[0]?.dataset.type; if (t === "capital" || t === "operating") m.querySelector("#btype").value = t; });
+          wire(m, { buy: async (f, d) => {
+            const ok = await run(async () => {
+              if (!(Number(d.qty) >= 1)) fail("Enter how many you bought.");
+              if (d.unit_cost === "" || Number(d.unit_cost) < 0) fail("Enter the cost per piece (₱0 if it was free).");
+              const receipt = await uploadReceipt("expense", d.receipt);
+              return rpc("record_equipment_purchase", { p_equipment_id: d.equipment_id, p_quantity: Number(d.qty), p_unit_cost: Number(d.unit_cost), p_date: d.date, p_payment_method_id: d.method || null,
+                p_vendor: d.vendor || null, p_category_id: d.category_id || null, p_expense_type: d.expense_type, p_receipt_path: receipt, p_notes: d.notes || null });
+            }, (r) => `Saved — ${r.total_qty} owned now${Number(r.total) > 0 ? `, ${peso(r.total)} added to Expenses` : ""}.`);
+            if (ok) { closeModal(); Views.equipment(root); }
+          } });
+        } });
+    },
+    count: (el) => {
+      const e = equipment.find((x) => x.id === el.dataset.id), away = e.rented_qty + e.damaged_qty + e.lost_qty;
+      openModal({ center: true, render: () => `${mhead(`How many ${esc(e.name.toLowerCase())}s do you own?`, "Equipment count")}<form class="stack" data-f="cnt">
+        ${field("Total owned", `<input class="in num" type="number" name="total" min="${away}" max="10000" value="${e.total_qty}" required>`, `Count every ${esc(e.name.toLowerCase())}, including ${e.rented_qty} rented out${e.damaged_qty ? `, ${e.damaged_qty} damaged` : ""}${e.lost_qty ? `, ${e.lost_qty} lost` : ""}. Available becomes total minus those.`)}
+        ${field("Note (optional)", inp("notes", "", 'placeholder="e.g. Counted after delivery"'))}<button class="btn">Save count</button></form>`,
+        bind: (m) => wire(m, { cnt: async (f, d) => { const ok = await run(() => rpc("set_equipment_count", { p_equipment_id: e.id, p_total: Number(d.total), p_notes: d.notes || null }), (r) => `Saved — ${r.total_qty} owned, ${r.available_qty} available.`); if (ok) { closeModal(); Views.equipment(root); } } }) });
+    },
     ret: (el) => {
       const r = rentals.find((x) => x.id === el.dataset.id), left = r.quantity - r.returned - r.damaged - r.lost;
       openModal({ center: true, render: () => `${mhead(`Return ${esc(r.item.toLowerCase())}s`, esc(r.customer))}<form class="stack" data-f="r"><p class="muted">${left} out</p><div class="grid g3">${field("Good", `<input class="in num" type="number" min="0" max="${left}" name="good" value="${left}">`)}${field("Damaged", `<input class="in num" type="number" min="0" max="${left}" name="damaged" value="0">`)}${field("Lost", `<input class="in num" type="number" min="0" max="${left}" name="lost" value="0">`)}</div>${field("Condition notes", inp("notes", ""))}<button class="btn">Record return</button></form>`,
