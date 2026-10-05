@@ -269,6 +269,23 @@ button.blk{display:flex;flex-direction:column;justify-content:flex-start;align-i
 .pub-top nav{flex-wrap:nowrap}
 @media (max-width:420px){.pub-top a.brand-mini b{font-size:16px}.pub-top .btn.sm{padding:0 8px}}
 .brand b{font-size:18px}
+:where(svg[aria-hidden="true"]){width:1.1em;height:1.1em;vertical-align:-.15em}
+.hours{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.hr{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:1px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;min-height:56px}
+.hr b{font-size:14.5px}.hr small{font-size:12.5px;color:var(--muted);font-weight:600}
+.hr:hover{border-color:var(--g5)}
+.hr[aria-pressed="true"]{background:var(--g7);border-color:var(--g7);color:#fff}.hr[aria-pressed="true"] small{color:var(--g1)}
+.hr.res{cursor:not-allowed;background:var(--deep);border-color:var(--deep);color:var(--faint)}.hr.res small{color:var(--muted)}
+.hr:focus-visible,.ctabs button:focus-visible{outline:3px solid var(--g2);outline-offset:2px}
+.ctabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 12px}
+.ctabs button{all:unset;cursor:pointer;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px;display:inline-flex;gap:6px;align-items:center}
+.ctabs button[aria-pressed="true"]{border-color:var(--g7);background:var(--g0);color:var(--g8)}
+.ctabs .n{background:var(--g7);color:#fff;border-radius:999px;font-size:11px;padding:0 7px;line-height:18px}
+.tag.lvl{background:var(--g1);color:var(--g8)}
+.addon{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.addon:last-child{border-bottom:0}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.yn .choice{padding:12px 14px;text-align:center}
 </style>
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABlCAMAAACx8telAAAAwFBMVEWdr6NnmW1SfGNijGrd3dt3noquxbM3dTpKdVwdakETfHxajmYA//8APQO508WMpJE4bUpJhFLL0rV7pI7//wA8b1EzmWZYcGJAck5//3+Cm3x/fwC7u8nGuLgAAAAWZjctcjr9/v4oaUMlaTwwa0lVVVV/f381dENHeFkAVQCLp5RXhWg4c0pFdlQ5clBDeE1ah2sAVVVulHlLeVtoinMAPT0A/wA3bU0AfwA7dVJNg1fR189VhWQ/Pz9Rglp3mYWUILmtAAAAQHRSTlMiImBrEjEeBJb/Ap4BBCFFhMYRRwF6BSHSAi4CExIA/vcF8/3TAwLykAMsb9Ctss5UA0xxUAQBsAKVsBOKBI9JrK71eQAACipJREFUeNqtWudi6jgTtTE1pGxu2fIVBckV3AiYFCDh/d9qR3LRCEsOJbr3R0IsjqefGcki56z5hx+Q71kW+WHbQ2rx1ad81X+hdCc+tYZ99Clf3wJuUcsZM7Fc5qGVeF71KROfZ1n2mkW9YiHe4fn2eolBtuUrezpxwdulPb7pmV4PDOuQuk8nL8ZeewAbXC8x/wqHPZ2xJl78PRL7hMSTc5Cf3Ay20quBCb0jWducWfb+HsF6h5V5TH015lyDXAODxSxV2SxeqF9LF3GmPMLG3yAxR97jb/Xuy5Qh1t18Xj3e8zD2+HuAh/g7V2QUvKgSB3MRewiaxeT5auBbQj2kRqq1XwA4NEbIB3JzLTBRgDOT+agNm/5uop7dXxjPGJgkEjgic+Mem9AUveHN9cCvMpQisiFdyM07uiueBL4NmK3Jh3kTtVDsef03ei2wTCFurwuYZ7q4MXOvwyqXAHcq8AUpmw0v8S8EPDcCvwT+s+8HAeIDAXlg0hGfvxNYftmblntIz2bWBcGsAL/LcMLAkKULx1kNRBKtCYBPVu4psXcmMFJ1QFZ5GM5mszBMnQV/TkBTlG9A5ODbgQOgCO6sXmG6Atg5T+LPZN1++ta/EpjVX+WTRTjDK8xjS9CegCwa98qwv58N/Ewinaqj2fEKgfb4FOd2KCkvQv12carSFYklMLNLYKAH4ay90gUZkb/IuHl8IfDg1RkN6FXAi/rNPzW4MzcE2vOnNDJb8vcUhTU+MXWbgEs/peRHPtMuFtERcVTgOc+jHiW3ZwOvscRUfOTMTAtkXroYuAow57Q8ZgIelgSE5iZcNx+SQgEelb979CTuaQLeEdErDEKjxGEhJXZtbpnSy6FA35wbTusjyjXXu1YFvCbrRuIBCQJSlHHtUXI5sNAX/Es6gB2ZcFgfJKYVj2AncZIuYJuszJqezQrJWOBxnxxq+V/puRL3npAItFvTs5lNmsyV8v2yTA5OsLKF6UzPxc710uHTsJIf/2ty9RpceiDZdnqexL70Up5AKFRc1gGcSihIsBvc88m8dz4wbO3WNPhWD5kYlSrBDN7OAi4wsN+t6dCSGZarNlL6yK+ZgRn4z26fjihtlLskxz3u+BwbB8R2kWOONJUYCbwilMkQUAWWKfd8YJvHRwdwTsH1qoffWwI/Pe0vlbggZNeRtmaxFBIMKimBkgguAAbqo+ceNREYvjSaho52V/08Zahl908HHkhg8JeiA/gTivGkcYd6YsRopCbdU4EXisRRZyw1TC8iL32vTmAomotukREwRS7CgTt8C1xnyZrkWneOrP9GFJEvBN53Cpw0Q5BG+BhCELn3slNkE/CaEMc14YJLx40P3ZBCkgdMGBN6icQRhFNuYlt9cl8+yfZQTCuB3RjqKB7TsU4rG4DBZe5MIoeHuvYCLmcLTHHj6OvJUQu4j4E30AFrkfe0YlegZ9k0umXggsguGoLZFwDPfX0KAUX/5M8xbyAqS8V4PFrOYLBjpx0U2wT8Kt5eU5CBTnNcxgfWYsRYEi+3AJfm6wbFsttRHRVgegzcb4mcW1bEJixd7kSv6hP7mNP6knx1EQIV2FOA2y1buN2Rw3h96MuZRFqP2QKZABkiBNYlwAE5KCLnq+YkwqelXqtAUGP2FJERsDK+TaoAC9EogE8h4L/v+7SZB6VtDq+IbJyBWcrQzMOZ9oV3qU1NTvjpx1FCGNQQqsBobjUZmxy7A5iLN6wlTq1avWjdVKFzNEjFZa7s/r4ETlRgoAZh0wzPW2OVZqaf0WNLSiuvDXnTBAxveitGPm5VBjWmeiPjSUUF/KMRKxruUnIuMAXf2k63IPMnnWu2//OrEjilbddN9TNCw/QWA4seBvryfLqN9CwGeq2J7MqP/jT4SmQ1vqVzgfoAeA1F0M0trZkaiqdv0ZoWdrLUlgoTsDvgYkzFDFPfgvlV76RtV3xEHPWEQAXOMDCk+8fH6XTvaDc2eS7VJyfZ4EwOOo0ZgaHzpCJTu6npcKCrP8NTZS0hsIhhUv4XIf3cLZsGzQs3+XVcncL5z5uPzebDD4JqvkYbK2uHIkZgoJmL6Xb7mOTadOtXhJ7XH/94TD4Sw91D49gpPUPVS06Xk+Rx6xiOgJKGIokDoaK35mtpl2ew8wCJ7P6n/e4miYEV07RqhLUmLAk99NGE2s6rx1xX2NTlp87OAPZsqLTy+1fArwpwXjXCvtlpx8Tae0xzg4FfYEDz7HZEGoF7ZPW43W6TVJe2ap9lD5HpagF7XyjHJSdLvOa9U5JPH/QWLnNx2HWjgUUyltuEwAxcjhO17cA/eKglcgRjWSouE3BrSxozbX7+PE4zKjA6eIpo6Lpi5KCrhymWzIuWi7488FxFDTjDhCAwAt9h4LE1nU63uS57YFL1xLKi33piMW7ZIO6wsQI8zYHebadUc56DWkJxGwQyxh3kOXtp26Cfkc3r73B9BH08IcDAG/KHfLCilprQRwInP7mLv/DBXpSHnInuF5xR8D1WqiI7qu6MwFW/1msXU9kdZeWNH5BlH9ZTmbDMdAEktJgdifxyFbDsByHErbJAbnG3sS+ZELxRwdSLMvNTgJOtUN2PVvpoLAwFnqfGXyVuWLbxoRiv1uNqZbKqiqwCI+fKiL3+dCyNS1c9pVcFyH/LIyJHVO/U+kSUZYQq1DH7VoF/P305wXiuCcDP0gi0bCnDoRjWOOQefovkN8au4W6JUdUeDUbz+a2G8Qgh3H3VD/vVmVgialnibME5ZE1Q5+dYZFWXiTJyph2MBwz2q6bQunOS5vS5j6/TmLpFPIPVH+LUFK+541MeXORC23lS+ZcrY9bHZsbV0WpbrylPz2aBmyYQIioBrmDNeL/Bz7jDPWjgU+718Sh7LEuFhUcgnhLwfd3pdyXwoH51ccAcExpyx+IFbc+dDV3YCfBkBexnt4B9VWAe8H5b4PL0IMP9RFJKCR00j+eUHhi8wwjFPbqglkJBaF2du2+n9WOnnldsJm6SELcx+LFbJQ8+rwjdsED5Tqll8iqPpbshYLrhNCLFpLrehuz/OZOo1fTg/ygifmFdc/+yFWBbSTIV8kFFHpFh2BrMBuLaRBgvOP62TNrqyIUqvuPdl3utGlf1rMYXPnDgDZOGu6G7T3QKwH3yIOgKR/4bdzV0dGRDcQBaAUMNGyZavraoJx/8mwoPcbcNlbNXsPLnA6Ss3OqDX6OZF7cgat+qZNznHlJL7BmY4rK5ZGu/orSLmxKIqBwKsTAu/yFWFR23vjrZibto/A7Ru/vFJdvdw5jVzQL/dMJ6i52CjIdw6KpbzC9Kl9tcJM7O4oT/YeyZF2NpAbnF7tkDuyiWy2Ucr9e/f/8xLigaO1EnD/lK9kNFXqvXW4o9vTX0VuVl2ix7HYtRI7X4xE5Z6Ndd37a+PAF/E1evluLW95fnqLrqZF6BX68PWCNohRUSSFF4Kdtubuo9Hx+bu7u7zd1mTubgcv8CCOrFp3zm8rQAAAAASUVORK5CYII=">
 </head><body>
@@ -519,6 +536,23 @@ function siteShell(inner) {
 }
 const minRate = () => Math.min(...(PUB.rates || []).map((r) => Number(r.rate_per_hour)));
 const PAY_ONLINE = () => PUB.payment_methods || [];
+const LEVELS = [["all_levels", "All levels"], ["beginner", "Beginner"], ["novice", "Novice"], ["intermediate", "Intermediate"], ["intermediate_advanced", "Intermediate to Advanced"], ["advanced", "Advanced"], ["high_advanced", "High Advanced"], ["expert", "Expert"], ["professional", "Professional"]];
+const levelLabel = (k) => (LEVELS.find((l) => l[0] === k) || LEVELS[0])[1];
+const levelTag = (k) => `<span class="tag lvl">${esc(levelLabel(k))}</span>`;
+const fullPay = (pct) => Number(pct) >= 100;
+// price of a stretch of court time, from the rate table (the database re-checks it)
+function tilePrice(date, off, mins = 60) {
+  const iso = dowOf(date) + 1; let t = 0;
+  for (const r of PUB.rates || []) {
+    if (!(r.applies_days || []).map(Number).includes(iso)) continue;
+    const ps = sinceOpenM(r.start_time); let pe = sinceOpenM(r.end_time); if (pe <= ps) pe += 1440;
+    t += Math.max(0, Math.min(off + mins, pe) - Math.max(off, ps)) * Number(r.rate_per_hour) / 60;
+  }
+  return round2(t);
+}
+const addonList = () => (PUB.addons_enabled === false ? [] : PUB.equipment || []);
+const addonTotal = (picked) => sum(addonList(), (e) => (picked?.[e.id] || 0) * Number(e.rental_price));
+const addonArgs = (picked) => Object.entries(picked || {}).filter(([, n]) => n > 0).map(([id, n]) => ({ equipment_id: id, quantity: n }));
 
 const Site = {
   async render(r) {
@@ -548,11 +582,11 @@ const Site = {
           <p class="muted">Pick the date, time and court. Book one court or several for your group.</p><span class="go">Rent a court ${ic("arrow")}</span></a>
       </section>
       ${sessions.length ? `<section class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Open Play today</h2><a class="btn ghost sm" href="#/book/open-play">Book ${ic("arrow")}</a></div>
-        <div class="grid g2" style="margin-top:12px">${sessions.map((s) => `<div class="sub"><div class="row" style="justify-content:space-between"><b>${fmtRange(s.starts_at, s.ends_at)}</b>${s.remaining === 0 ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : `<b style="color:var(--g7)">${s.remaining} slot${s.remaining === 1 ? "" : "s"} left</b>`}</div></div>`).join("")}</div></section>` : ""}
+        <div class="grid g2" style="margin-top:12px">${sessions.map((s) => `<div class="sub"><div class="row" style="justify-content:space-between"><div class="row" style="gap:8px"><b>${fmtRange(s.starts_at, s.ends_at)}</b>${levelTag(s.level)}</div>${s.remaining === 0 ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : `<b style="color:var(--g7)">${s.remaining} slot${s.remaining === 1 ? "" : "s"} left</b>`}</div><div class="muted" style="font-size:13px;margin-top:2px"><b class="num" style="color:var(--ink)">${s.booked} / ${s.capacity}</b> booked</div></div>`).join("")}</div></section>` : ""}
       <section class="grid g3" style="margin-top:16px">
         <div class="card"><p class="eyebrow">Hours</p><p style="margin-top:6px"><b>${clock(PUB.open_time)} – ${clock(PUB.close_time)}</b><br><span class="muted">Every day</span></p></div>
         <div class="card"><p class="eyebrow">Court rates</p><div style="margin-top:6px">${(PUB.rates || []).map((r) => `<div class="row" style="justify-content:space-between"><span class="muted">${clock(r.start_time)} – ${clock(r.end_time)}</span><b>${peso(r.rate_per_hour)}/hr</b></div>`).join("")}</div></div>
-        <div class="card"><p class="eyebrow">How it works</p><p class="muted" style="margin-top:6px">Book → pay at least ${Number(PUB.reservation_fee_pct)}% to reserve → upload your receipt → we confirm → pay the rest at the counter.</p></div>
+        <div class="card"><p class="eyebrow">How it works</p><p class="muted" style="margin-top:6px">${fullPay(PUB.reservation_fee_pct) ? "Book → pay the full amount online → upload your receipt → we confirm and your slot is reserved." : `Book → pay at least ${Number(PUB.reservation_fee_pct)}% to reserve → upload your receipt → we confirm → pay the rest at the counter.`}</p></div>
       </section>
       ${PUB.cancellation_policy_text ? `<p class="muted" style="font-size:13px;margin-top:16px;max-width:760px">Cancellation policy: ${esc(PUB.cancellation_policy_text)}</p>` : ""}`);
   },
@@ -569,7 +603,7 @@ const Site = {
       ${found ? `<div class="card stack"><div class="row" style="justify-content:space-between"><span class="bigref">${esc(found.reference)}</span>${statusPill(found.status)}</div>
         <dl class="kv"><dt>Name</dt><dd>${esc(found.customer_name)}</dd><dt>Type</dt><dd>${found.booking_type === "open_play" ? `Open Play · ${found.player_count} player(s)` : `Court Rental · ${esc((found.courts || []).join(", "))}`}</dd>
         <dt>When</dt><dd>${fmtDate(found.business_date, { weekday: "short", month: "short", day: "numeric" })}, ${fmtRange(found.starts_at, found.ends_at)}</dd><dt>Total</dt><dd>${peso(found.total_amount)}</dd><dt>Paid</dt><dd>${peso(found.amount_paid)}</dd><dt>Balance</dt><dd>${peso(found.balance_due)}</dd>
-        ${found.status === "pending_payment" && found.expires_at ? `<dt>Pay reservation by</dt><dd>${fmtDT(found.expires_at)}</dd>` : ""}</dl>
+        ${found.status === "pending_payment" && found.expires_at ? `<dt>Pay by</dt><dd>${fmtDT(found.expires_at)}</dd>` : ""}</dl>
         ${found.status === "expired" ? notice("This reservation has expired because payment was not received within the reservation period.", "warn") : ""}
         ${own ? `<a class="btn" href="${bookingLink(own.ref, own.token)}">Open booking & payment</a>` : found.status === "pending_payment" ? `<p class="muted" style="font-size:13px">To upload your payment, open the booking link you got when you booked, or message us with your reference number.</p>` : ""}</div>` : ""}
       ${mine.length ? `<div class="card"><h2>Booked on this phone</h2><div class="stack" style="gap:8px">${mine.map((m) => `<a class="row" href="${bookingLink(m.ref, m.token)}" style="justify-content:space-between;text-decoration:none;color:inherit;border-bottom:1px solid var(--line);padding-bottom:8px"><span class="ref">${esc(m.ref)}</span><span class="muted">${ic("arrow", "")}</span></a>`).join("")}</div></div>` : ""}
@@ -591,20 +625,24 @@ const Site = {
     const canPay = ["pending_payment", "payment_submitted"].includes(b.status) && needFee > 0;
     const link = location.origin + location.pathname + bookingLink(b.reference, token);
     const when = `${fmtDate(b.business_date, { weekday: "long", month: "long", day: "numeric" })} · ${fmtRange(b.starts_at, b.ends_at)}`;
-    const what = b.booking_type === "open_play" ? `Open Play · ${b.player_count} player${b.player_count > 1 ? "s" : ""}` : `Court Rental · ${(b.courts || []).map((c) => esc(c.court)).join(", ")}`;
-    const headline = { pending_payment: "Pay the reservation fee to secure your slot", payment_submitted: "Payment received — we're checking it", confirmed: "Your slot is reserved!", checked_in: "Enjoy your game!", completed: "Thanks for playing", cancelled: "This booking was cancelled", expired: "This reservation has expired", no_show: "Marked as no-show" }[b.status];
+    const full = fullPay(b.reservation_fee_pct);
+    const what = b.booking_type === "open_play" ? `Open Play · ${b.player_count} player${b.player_count > 1 ? "s" : ""}${b.level ? ` · ${esc(levelLabel(b.level))}` : ""}` : `Court Rental<br>${(b.courts || []).map((c) => `${esc(c.court)} · ${fmtRange(c.starts_at, c.ends_at)}`).join("<br>")}`;
+    const headline = { pending_payment: full ? "Pay to secure your slot" : "Pay the reservation fee to secure your slot", payment_submitted: "Payment received — we're checking it", confirmed: "Your slot is reserved!", checked_in: "Enjoy your game!", completed: "Thanks for playing", cancelled: "This booking was cancelled", expired: "This reservation has expired", no_show: "Marked as no-show" }[b.status];
     APP.innerHTML = siteShell(`<div class="pub-narrow stack">
       <div class="card stack" style="text-align:center;align-items:center">
         <p class="eyebrow">Booking reference</p><div class="bigref">${esc(b.reference)}</div>${statusPill(b.status)}
         <h2>${headline}</h2>
-        <p class="muted" style="max-width:440px">${b.status === "pending_payment" ? `We're holding your slot until <b style="color:var(--ink)">${fmtDT(b.expires_at)}</b> (${relTime(b.expires_at)}). If the reservation fee isn't paid by then, the slot is released.` : b.status === "payment_submitted" ? "We'll confirm your booking once we've verified your payment. Check back here anytime." : b.status === "expired" ? "This reservation has expired because payment was not received within the reservation period. You're welcome to book again." : "Please keep this reference number."}</p>
+        <p class="muted" style="max-width:440px">${b.status === "pending_payment" ? `We're holding your slot until <b style="color:var(--ink)">${fmtDT(b.expires_at)}</b> (${relTime(b.expires_at)}). If ${full ? "payment isn't received" : "the reservation fee isn't paid"} by then, the slot is released.` : b.status === "payment_submitted" ? "We'll confirm your booking once we've verified your payment. Check back here anytime." : b.status === "expired" ? "This reservation has expired because payment was not received within the reservation period. You're welcome to book again." : "Please keep this reference number."}</p>
         <div class="row" style="justify-content:center"><button class="btn sec sm" data-a="copy" data-t="${esc(link)}">Copy booking link</button></div>
       </div>
       ${msgr}
-      <div class="card"><dl class="kv"><dt>Name</dt><dd>${esc(b.customer_name)}</dd><dt>When</dt><dd>${when}</dd><dt>What</dt><dd>${what}</dd></dl></div>
-      <div class="total-box"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd><dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd><dt>Paid so far</dt><dd>${peso(b.amount_paid)}</dd>${submitted ? `<dt>Being checked</dt><dd>${peso(submitted)}</dd>` : ""}<dt>Balance (pay at the counter)</dt><dd class="big">${peso(b.balance_due)}</dd></dl></div>
+      <div class="card"><dl class="kv"><dt>Name</dt><dd>${esc(b.customer_name)}</dd><dt>When</dt><dd>${when}</dd><dt>What</dt><dd>${what}</dd>
+        ${(b.player_names || []).length ? `<dt>Players</dt><dd style="font-weight:500">${b.player_names.map(esc).join(", ")}</dd>` : ""}
+        ${(b.addons || []).length ? `<dt>Add-ons</dt><dd style="font-weight:500">${b.addons.map((a) => `${esc(a.name)} × ${a.quantity}`).join(", ")}<br><span class="muted" style="font-size:13px">Pick them up at the counter.</span></dd>` : ""}</dl></div>
+      ${b.booking_type === "open_play" && b.reclub_member && PUB.reclub_url && !["cancelled", "expired"].includes(b.status) ? `<div class="card row" style="justify-content:space-between;gap:10px"><span style="font-size:14px">Add your players' names on our Reclub page.</span><a class="btn sec sm" href="${esc(PUB.reclub_url)}" target="_blank" rel="noopener">${ic("people")} Open Reclub</a></div>` : ""}
+      <div class="total-box"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd>${full ? "" : `<dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd>`}<dt>Paid so far</dt><dd>${peso(b.amount_paid)}</dd>${submitted ? `<dt>Being checked</dt><dd>${peso(submitted)}</dd>` : ""}<dt>${full && b.status === "pending_payment" ? "To pay" : "Balance (pay at the counter)"}</dt><dd class="big">${peso(b.balance_due)}</dd></dl></div>
       ${(b.payments || []).filter((p) => p.status === "rejected").map((p) => notice(`A payment of ${peso(p.amount)} couldn't be confirmed${p.rejection_reason ? `: “${esc(p.rejection_reason)}”` : ""}. Please upload a clearer receipt.`, "warn")).join("")}
-      ${canPay ? `<div class="card stack"><h2>Pay the reservation fee: ${peso(needFee)}</h2>
+      ${canPay ? `<div class="card stack"><h2>${full ? "Pay" : "Pay the reservation fee"}: ${peso(needFee)}</h2>
         <p class="muted">${esc(PUB.payment_instructions || "")}</p>
         <div class="grid g2">${PAY_ONLINE().map((m) => `<div class="pay-acct"><p class="eyebrow">${esc(m.name)}</p>${m.bank_name ? `<div>${esc(m.bank_name)}</div>` : ""}<div><b>${esc(m.account_name || "")}</b></div><div class="mono" style="font-size:18px">${esc(m.account_number || "")}</div>${m.account_number ? `<button class="btn ghost sm" type="button" data-a="copy" data-t="${esc(m.account_number)}">Copy number</button>` : ""}${m.instructions ? `<p class="muted" style="font-size:12.5px">${esc(m.instructions)}</p>` : ""}</div>`).join("")}</div>
         <form class="stack" data-f="pay">
@@ -649,7 +687,7 @@ const Site = {
 const Flow = {
   S: null,
   start(type, mode, root) {
-    if (!Flow.S || Flow.S.mode !== mode || (type && Flow.S.type !== type)) Flow.S = { mode, type, step: 1, date: PUB.today, session: null, players: 2, start: null, dur: 120, courts: [], name: "", phone: "", email: "", notes: "", source: mode === "staff" ? "walk_in" : "online" };
+    if (!Flow.S || Flow.S.mode !== mode || (type && Flow.S.type !== type)) Flow.S = { mode, type, step: 1, date: PUB.today, session: null, players: 2, court: null, sel: {}, items: [], addons: {}, reclub: null, names: [], name: "", phone: "", email: "", notes: "", source: mode === "staff" ? "walk_in" : "online" };
     Flow.root = root;
     return Flow.draw();
   },
@@ -692,92 +730,129 @@ const Flow = {
     return `${Flow.dateStrip()}
       <h3 style="margin:18px 0 10px">${fmtDate(S.date, { weekday: "long", month: "long", day: "numeric" })}</h3>
       <div class="stack" style="gap:10px">${sessions.length ? sessions.map((x) => { const ok = sessOk(x); return `<button type="button" class="choice ${ok ? "" : "dis"}" ${ok ? `data-a="session" data-id="${x.id}"` : "disabled"} aria-pressed="${S.session === x.id}">
-        <div class="row" style="justify-content:space-between"><div><b style="font-size:17px">${fmtRange(x.starts_at, x.ends_at)}</b>${S.mode === "staff" ? `<div class="muted">${x.booked} / ${x.capacity} spots booked</div>` : ""}</div>
+        <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="row" style="gap:8px"><b style="font-size:17px">${fmtRange(x.starts_at, x.ends_at)}</b>${levelTag(x.level)}</div><div class="muted"><b class="num" style="color:var(--ink)">${x.booked} / ${x.capacity}</b> booked</div></div>
         ${x.remaining === 0 ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : !ok ? `<span class="tag">Closed</span>` : `<b style="color:var(--g7)">${x.remaining} slot${x.remaining === 1 ? "" : "s"} left</b>`}</div>
-        ${S.mode === "staff" ? `<div class="bar" style="margin-top:10px"><i style="width:${x.capacity ? Math.min(100, (x.booked / x.capacity) * 100) : 100}%"></i></div>` : ""}</button>`; }).join("") : `<p class="empty">No Open Play sessions on this day.</p>`}</div>
+        <div class="bar" style="margin-top:10px"><i style="width:${x.capacity ? Math.min(100, (x.booked / x.capacity) * 100) : 100}%"></i></div></button>`; }).join("") : `<p class="empty">No Open Play sessions on this day.</p>`}</div>
       ${cur ? `<div class="row" style="margin-top:18px;justify-content:space-between"><div><p class="label">Number of players</p><div class="qty"><button type="button" data-a="players" data-d="-1" aria-label="Fewer players">−</button><span class="num">${S.players}</span><button type="button" data-a="players" data-d="1" aria-label="More players">+</button></div></div>
         <div style="text-align:right"><p class="muted">${S.players} × ${peso(cur.price_per_player)}</p><p style="font-family:var(--display);font-size:26px">${peso(S.players * cur.price_per_player)}</p></div></div>` : ""}
       <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn" data-a="next" ${cur ? "" : "disabled"}>Continue ${ic("arrow")}</button></div>`;
   },
+  // Court rental: one tile per hour for each court; taken hours show "Reserved"
   async stepCourt() {
-    const S = Flow.S, len = Number(PUB.operating_minutes), slot = Number(PUB.rental_slot_minutes), minD = Number(PUB.rental_min_minutes), maxD = Number(PUB.rental_max_minutes);
-    const avail = await rpc("get_court_availability", { p_date: S.date });
-    const nowOff = S.date === PUB.today ? Math.ceil(((Date.now() - openInstant(S.date)) / 60e3 + (S.mode === "staff" ? 0 : Number(PUB.booking_min_lead_minutes || 0))) / slot) * slot : 0;
-    const starts = []; for (let m = Math.max(0, nowOff); m + minD <= len; m += slot) starts.push(m);
-    if (!starts.length) return `${Flow.dateStrip()}<p class="empty">No more times available on this day. Pick another date.</p>`;
-    if (S.start == null || !starts.includes(S.start)) S.start = starts.find((m) => m >= sinceOpenM("17:00")) ?? starts[0];
-    const durs = []; for (let d = minD; d <= maxD && S.start + d <= len; d += slot) durs.push(d);
-    if (!durs.includes(S.dur)) S.dur = durs.includes(120) ? 120 : durs[0];
-    const s = S.start, e = S.start + S.dur;
-    const courts = avail.map((c) => {
-      const busy = (c.busy || []).find((x) => isoOff(S.date, x.starts_at) < e && s < isoOff(S.date, x.ends_at));
-      return { id: c.court_id, name: c.court_name, why: c.court_status !== "active" ? "Maintenance" : busy ? (busy.kind === "open_play" ? "Open Play" : "Booked") : null };
-    });
-    S.courts = S.courts.filter((id) => courts.some((c) => c.id === id && !c.why));
-    let quote = null, qerr = "";
-    if (S.courts.length) { try { quote = await rpc("quote_court_rental", { p_items: S.courts.map((id) => ({ court_id: id, starts_at: offISO(S.date, s), ends_at: offISO(S.date, e) })) }); } catch (er) { qerr = friendly(er); } }
-    Flow.quote = quote;
-    const segs = quote?.lines?.[0]?.price?.segments || [];
+    const S = Flow.S, len = Number(PUB.operating_minutes);
+    if (!Flow.avail || Flow.avail.date !== S.date || Date.now() - Flow.avail.at > 30e3) Flow.avail = { date: S.date, at: Date.now(), list: await rpc("get_court_availability", { p_date: S.date }) };
+    const sinceOpen = (Date.now() - openInstant(S.date)) / 60e3;
+    const cutoff = S.date !== PUB.today ? -Infinity : S.mode === "staff" ? sinceOpen - 59 : sinceOpen + Number(PUB.booking_min_lead_minutes || 0);
+    const courts = Flow.avail.list.map((c) => ({ id: c.court_id, name: c.court_name, down: c.court_status !== "active", busy: (c.busy || []).map((x) => [isoOff(S.date, x.starts_at), isoOff(S.date, x.ends_at)]) }));
+    const hours = []; for (let m = 0; m + 60 <= len; m += 60) if (m >= cutoff) hours.push(m);
+    const state = (c, m) => c.down ? "down" : c.busy.some(([a, b]) => a < m + 60 && m < b) ? "res" : "free";
+    for (const c of courts) S.sel[c.id] = (S.sel[c.id] || []).filter((m) => hours.includes(m) && state(c, m) === "free").sort((a, b) => a - b);
+    if (!S.court || !courts.some((c) => c.id === S.court)) S.court = (courts.find((c) => !c.down) || courts[0])?.id;
+    const cur = courts.find((c) => c.id === S.court);
+    // back-to-back hours on the same court become one booking line
+    S.items = [];
+    for (const c of courts) { let run = null; for (const m of S.sel[c.id]) { if (run && run.e === m) run.e = m + 60; else { run = { court_id: c.id, name: c.name, s: m, e: m + 60 }; S.items.push(run); } } }
+    const total = sum(S.items, (x) => tilePrice(S.date, x.s, x.e - x.s));
+    if (!hours.length || !cur) return `${Flow.dateStrip()}<p class="empty">No more times available on this day. Pick another date.</p>`;
     return `${Flow.dateStrip()}
-      <div class="grid g2" style="margin-top:18px">${field("Start time", sel("start", starts.map((m) => [m, offClock(m)]), s, 'data-a="start"'))}${field("How long?", sel("dur", durs.map((d) => [d, `${d / 60} hour${d === 60 ? "" : "s"}`]), S.dur, 'data-a="dur"'))}</div>
-      <p class="muted" style="margin-top:8px">${fmtDate(S.date, { weekday: "long", month: "short", day: "numeric" })} · ${offClock(s)} – ${offClock(e)}</p>
-      <h3 style="margin:18px 0 10px">Choose your court${courts.filter((c) => !c.why).length > 1 ? "(s)" : ""}</h3>
-      <div class="grid g3">${courts.map((c) => `<button type="button" class="choice ${c.why ? "dis" : ""}" ${c.why ? "disabled" : `data-a="court" data-id="${c.id}"`} aria-pressed="${S.courts.includes(c.id)}">
-        <div class="row" style="justify-content:space-between"><b style="font-size:16px">${esc(c.name)}</b>${c.why ? `<span class="tag">${c.why}</span>` : S.courts.includes(c.id) ? `<span style="color:var(--g7)">${ic("check")}</span>` : `<span class="muted" style="font-size:13px">Available</span>`}</div></button>`).join("")}</div>
-      ${courts.every((c) => c.why) ? notice("All courts are taken at this time. Try another time or date.", "warn") : ""}
-      ${qerr ? `<div style="margin-top:12px">${notice(esc(qerr), "bad")}</div>` : ""}
-      ${quote ? `<div class="notice" style="margin-top:14px">${ic("check")}<div><b>${S.courts.length} court${S.courts.length > 1 ? "s" : ""} · ${peso(quote.total)}</b><br>${segs.map((g) => `${clock(g.from)}–${clock(g.to)}: ${g.minutes / 60} h × ${peso(g.rate)} = ${peso(g.amount)}`).join(" · ")}${S.courts.length > 1 ? " per court" : ""}</div></div>` : ""}
-      <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn" data-a="next" ${quote ? "" : "disabled"}>Continue ${ic("arrow")}</button></div>`;
+      <h3 style="margin:18px 0 0">${fmtDate(S.date, { weekday: "long", month: "long", day: "numeric" })}</h3>
+      <div class="ctabs" role="group" aria-label="Choose a court">${courts.map((c) => `<button type="button" data-a="ctab" data-id="${c.id}" aria-pressed="${c.id === S.court}">${esc(c.name)}${S.sel[c.id].length ? `<span class="n">${S.sel[c.id].length}h</span>` : ""}</button>`).join("")}</div>
+      ${cur.down ? notice(`${esc(cur.name)} is closed for maintenance on this day. Pick another court.`, "warn") : `<p class="muted" style="font-size:13.5px;margin:0 0 10px">Tap the hours you want on <b style="color:var(--ink)">${esc(cur.name)}</b>. Need more than one court? Switch courts above and tap their hours too.</p>
+      <div class="hours">${hours.map((m) => { const st = state(cur, m), on = S.sel[cur.id].includes(m); return st === "free"
+        ? `<button type="button" class="hr" data-a="hour" data-m="${m}" aria-pressed="${on}"><b>${offClock(m)} – ${offClock(m + 60)}</b><small>${on ? "✓ Selected" : peso(tilePrice(S.date, m))}</small></button>`
+        : `<button type="button" class="hr res" disabled><b>${offClock(m)} – ${offClock(m + 60)}</b><small>Reserved</small></button>`; }).join("")}</div>`}
+      ${S.items.length ? `<div class="notice" style="margin-top:14px">${ic("check")}<div style="flex:1"><div class="row" style="justify-content:space-between"><b>Your selection</b><button type="button" class="btn ghost sm" data-a="clear">Clear</button></div>${S.items.map((x) => `<div class="row" style="justify-content:space-between"><span>${esc(x.name)} · ${offClock(x.s)} – ${offClock(x.e)}</span><span class="num">${peso(tilePrice(S.date, x.s, x.e - x.s))}</span></div>`).join("")}<div class="row" style="justify-content:space-between;margin-top:4px"><b>Total</b><b class="num">${peso(total)}</b></div></div></div>` : ""}
+      <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn" data-a="next" ${S.items.length ? "" : "disabled"}>Continue ${ic("arrow")}</button></div>`;
+  },
+  // copy what's typed in the details form into the booking state (before redrawing)
+  keep() {
+    const f = Flow.root.querySelector("form[data-f=details]"); if (!f) return;
+    const d = formData(f), S = Flow.S;
+    if ("name" in d) S.name = d.name.trim();
+    if ("phone" in d) S.phone = d.phone.trim();
+    if ("source" in d) S.source = d.source;
+    if ("notes" in d) S.notes = d.notes;
+    for (const k of Object.keys(d)) if (k.startsWith("pn_")) S.names[Number(k.slice(3))] = d[k];
   },
   stepDetails() {
-    const S = Flow.S;
+    const S = Flow.S, op = S.type === "open_play", rc = PUB.reclub_url, staff = S.mode === "staff";
+    const showNames = op && (staff || !rc || S.reclub === false);
+    const names = op ? Array.from({ length: S.players }, (_, i) => S.names[i] ?? (i === 0 ? S.name : "")) : [];
+    const eq = addonList();
     return `<form class="stack" data-f="details">
       ${field("Your name", inp("name", S.name, 'required autocomplete="name" placeholder="e.g. John Dela Cruz"'))}
-      ${field("Mobile number (optional)", inp("phone", S.phone, `inputmode="tel" autocomplete="tel" placeholder="0917 123 4567"`), S.mode === "public" ? "Optional — only if you'd like us to be able to reach you." : "Optional")}
-      ${S.mode === "staff" ? field("Booked via", sel("source", [["walk_in", "Walk-in"], ["phone", "Phone / Messenger"], ["reclub", "Reclub"]], S.source)) + field("Notes (optional)", inp("notes", S.notes)) : ""}
+      ${field("Mobile number (optional)", inp("phone", S.phone, `inputmode="tel" autocomplete="tel" placeholder="0917 123 4567"`), staff ? "Optional" : "Optional — only if you'd like us to be able to reach you.")}
+      ${op && rc ? `<div class="f">Are you on Reclub?${staff ? " (optional)" : ""}<div class="yn"><button type="button" class="choice" data-a="reclub" data-v="1" aria-pressed="${S.reclub === true}"><b>Yes, I'm on Reclub</b></button><button type="button" class="choice" data-a="reclub" data-v="0" aria-pressed="${S.reclub === false}"><b>No, not yet</b></button></div></div>` : ""}
+      ${op && rc && S.reclub === true ? notice(`Great! Please join our club on Reclub and add the names of your other players there. <a href="${esc(rc)}" target="_blank" rel="noopener"><b>Open our Reclub page</b></a>`) : ""}
+      ${showNames ? `<div class="f">Player names${staff ? " (optional)" : ""}<div class="grid g2">${names.map((n, i) => `<input class="in" name="pn_${i}" value="${esc(n)}" placeholder="Player ${i + 1}" maxlength="100" aria-label="Player ${i + 1} name" ${staff ? "" : "required"}>`).join("")}</div>${staff ? "" : `<small>Please type the name of everyone playing. We'll add your group to our Reclub list for you.</small>`}</div>` : ""}
+      ${eq.length ? `<div class="f">Add-ons (optional)<div class="sub" style="padding:2px 14px">${eq.map((e) => `<div class="addon"><div><b>${esc(e.name)} rental</b><div class="muted" style="font-size:13px">${peso(e.rental_price)} each</div></div><div class="qty"><button type="button" data-a="addon" data-id="${e.id}" data-d="-1" aria-label="Fewer ${esc(e.name)}s">−</button><span class="num">${S.addons[e.id] || 0}</span><button type="button" data-a="addon" data-id="${e.id}" data-d="1" aria-label="More ${esc(e.name)}s">+</button></div></div>`).join("")}</div><small>Not required. Pick them up at the counter when you arrive.</small></div>` : ""}
+      ${staff ? field("Booked via", sel("source", [["walk_in", "Walk-in"], ["phone", "Phone / Messenger"], ["reclub", "Reclub"]], S.source)) + field("Notes (optional)", inp("notes", S.notes)) : ""}
       <div class="row" style="justify-content:space-between"><button type="button" class="btn ghost" data-a="back">${ic("back")} Back</button><button class="btn">Review ${ic("arrow")}</button></div></form>`;
   },
   async stepReview() {
-    const S = Flow.S;
-    let total, when, what;
-    if (S.type === "open_play") { const x = Flow.sessions.find((v) => v.id === S.session); total = S.players * x.price_per_player; when = fmtRange(x.starts_at, x.ends_at); what = `${S.players} player${S.players > 1 ? "s" : ""}`; }
-    else { total = Flow.quote.total; when = `${offClock(S.start)} – ${offClock(S.start + S.dur)}`; what = (await Flow.courtNames()).join(", "); }
-    const fee = round2(total * Number(PUB.reservation_fee_pct) / 100);
-    return `<dl class="kv"><dt>Booking</dt><dd>${S.type === "open_play" ? "Open Play" : "Court Rental"}</dd><dt>Date</dt><dd>${fmtDate(S.date, { weekday: "long", month: "long", day: "numeric" })}</dd><dt>Time</dt><dd>${when}</dd><dt>${S.type === "open_play" ? "Players" : "Court(s)"}</dt><dd>${esc(what)}</dd><dt>Name</dt><dd>${esc(S.name)}</dd>${S.phone ? `<dt>Mobile</dt><dd class="mono">${esc(S.phone)}</dd>` : ""}</dl>
-      <div class="total-box" style="margin-top:16px"><dl class="kv num"><dt>Total price</dt><dd>${peso(total)}</dd><dt>Reservation fee (${Number(PUB.reservation_fee_pct)}%) — pay now</dt><dd class="big">${peso(fee)}</dd><dt>Remaining balance — pay at the counter</dt><dd>${peso(total - fee)}</dd></dl></div>
-      <p class="muted" style="font-size:13px;margin-top:12px">${fee > 0 ? `After you book, pay the reservation fee within ${Number(PUB.payment_expiry_hours)} hours by ${PAY_ONLINE().map((m) => esc(m.name)).join(" or ")} and upload your receipt. Unpaid bookings are released automatically.` : "No reservation fee is needed — your booking is confirmed right away."}</p>
+    const S = Flow.S, op = S.type === "open_play";
+    let base, sess;
+    if (op) { sess = Flow.sessions.find((v) => v.id === S.session); base = S.players * sess.price_per_player; }
+    else base = Number(Flow.quote.total);
+    const adds = addonList().filter((e) => (S.addons[e.id] || 0) > 0), addT = addonTotal(S.addons), total = round2(base + addT);
+    const full = fullPay(PUB.reservation_fee_pct), fee = full ? total : round2(total * Number(PUB.reservation_fee_pct) / 100);
+    const names = op ? S.names.slice(0, S.players).map((x) => (x || "").trim()).filter(Boolean) : [];
+    return `<dl class="kv"><dt>Booking</dt><dd>${op ? "Open Play" : "Court Rental"}</dd><dt>Date</dt><dd>${fmtDate(S.date, { weekday: "long", month: "long", day: "numeric" })}</dd>
+      ${op ? `<dt>Time</dt><dd>${fmtRange(sess.starts_at, sess.ends_at)}</dd><dt>Level</dt><dd>${esc(levelLabel(sess.level))}</dd><dt>Players</dt><dd>${S.players}</dd>
+        ${names.length ? `<dt>Player names</dt><dd style="font-weight:500">${names.map(esc).join(", ")}</dd>` : S.reclub ? `<dt>Player names</dt><dd style="font-weight:500">You'll add them on Reclub</dd>` : ""}`
+      : `<dt>Court${S.items.length > 1 ? "s" : ""} & time</dt><dd>${S.items.map((x) => `${esc(x.name)} · ${offClock(x.s)} – ${offClock(x.e)}`).join("<br>")}</dd>`}
+      ${adds.length ? `<dt>Add-ons</dt><dd>${adds.map((e) => `${esc(e.name)} × ${S.addons[e.id]}`).join(", ")}</dd>` : ""}
+      <dt>Name</dt><dd>${esc(S.name)}</dd>${S.phone ? `<dt>Mobile</dt><dd class="mono">${esc(S.phone)}</dd>` : ""}</dl>
+      <div class="total-box" style="margin-top:16px"><dl class="kv num">${adds.length ? `<dt>${op ? "Open Play" : "Court rental"}</dt><dd>${peso(base)}</dd>${adds.map((e) => `<dt>${esc(e.name)} rental × ${S.addons[e.id]}</dt><dd>${peso(S.addons[e.id] * e.rental_price)}</dd>`).join("")}` : ""}
+        <dt>Total price</dt><dd>${peso(total)}</dd>${full ? `<dt>Pay now to reserve</dt><dd class="big">${peso(fee)}</dd>` : `<dt>Reservation fee (${Number(PUB.reservation_fee_pct)}%) — pay now</dt><dd class="big">${peso(fee)}</dd><dt>Remaining balance — pay at the counter</dt><dd>${peso(total - fee)}</dd>`}</dl></div>
+      <p class="muted" style="font-size:13px;margin-top:12px">${fee > 0 ? `After you book, pay ${full ? "the full amount" : "the reservation fee"} within ${Number(PUB.payment_expiry_hours)} hours by ${PAY_ONLINE().map((m) => esc(m.name)).join(" or ")} and upload your receipt. Your slot is reserved once we confirm your payment. Unpaid bookings are released automatically.` : "No payment is needed — your booking is confirmed right away."}</p>
       ${Flow.error ? `<div style="margin-top:12px">${notice(esc(Flow.error), "bad")}</div>` : ""}
       <div class="row" style="justify-content:space-between;margin-top:16px"><button type="button" class="btn ghost" data-a="back">${ic("back")} Back</button><button class="btn" data-a="book" style="min-width:180px">Book now</button></div>`;
   },
-  async courtNames() { const avail = await rpc("get_court_availability", { p_date: Flow.S.date }); return Flow.S.courts.map((id) => avail.find((c) => c.court_id === id)?.court_name || "Court"); },
   bind() {
     const S = Flow.S;
     wire(Flow.root, {
-      date: (el) => { S.date = el.dataset.d; S.session = null; S.courts = []; S.start = null; Flow.draw(); },
+      date: (el) => { S.date = el.dataset.d; S.session = null; S.sel = {}; Flow.avail = null; Flow.draw(); },
       session: (el) => { S.session = el.dataset.id; Flow.draw(); },
       players: (el) => { S.players = Math.max(1, S.players + Number(el.dataset.d)); Flow.draw(); },
-      start: (el) => { S.start = Number(el.value); Flow.draw(); },
-      dur: (el) => { S.dur = Number(el.value); Flow.draw(); },
-      court: (el) => { const id = el.dataset.id; S.courts = S.courts.includes(id) ? S.courts.filter((c) => c !== id) : [...S.courts, id]; Flow.draw(); },
-      next: () => { S.step = 2; Flow.error = ""; Flow.draw(); window.scrollTo({ top: 0 }); },
-      back: () => { S.step = Math.max(1, S.step - 1); Flow.error = ""; Flow.draw(); },
-      details: (f, d) => {
-        if (d.name.trim().length < 2) return toast("Please enter your name.", true);
-        if (d.phone.trim() && !/^[0-9+() -]{7,30}$/.test(d.phone.trim())) return toast("Please enter a valid mobile number, or leave it blank.", true);
-        Object.assign(S, { name: d.name.trim(), phone: d.phone.trim(), source: d.source || S.source, notes: d.notes || "" }); S.step = 3; Flow.draw(); window.scrollTo({ top: 0 });
+      ctab: (el) => { S.court = el.dataset.id; Flow.draw(); },
+      hour: (el) => { const m = Number(el.dataset.m), l = S.sel[S.court] || []; S.sel[S.court] = l.includes(m) ? l.filter((x) => x !== m) : [...l, m]; Flow.draw(); },
+      clear: () => { S.sel = {}; Flow.draw(); },
+      reclub: (el) => { Flow.keep(); S.reclub = el.dataset.v === "1"; Flow.draw(); },
+      addon: (el) => { Flow.keep(); const e = addonList().find((x) => x.id === el.dataset.id); if (!e) return; S.addons[e.id] = Math.min(Number(e.max) || 20, Math.max(0, (S.addons[e.id] || 0) + Number(el.dataset.d))); Flow.draw(); },
+      next: async (el) => {
+        if (S.type === "court_rental") {
+          el.disabled = true;
+          try { Flow.quote = await rpc("quote_court_rental", { p_items: S.items.map((x) => ({ court_id: x.court_id, starts_at: offISO(S.date, x.s), ends_at: offISO(S.date, x.e) })) }); }
+          catch (e) { el.disabled = false; return toast(friendly(e), true); }
+        }
+        S.step = 2; Flow.error = ""; Flow.draw(); window.scrollTo({ top: 0 });
+      },
+      back: () => { Flow.keep(); S.step = Math.max(1, S.step - 1); Flow.error = ""; Flow.draw(); },
+      details: () => {
+        Flow.keep();
+        if (S.name.length < 2) return toast("Please enter your name.", true);
+        if (S.phone && !/^[0-9+() -]{7,30}$/.test(S.phone)) return toast("Please enter a valid mobile number, or leave it blank.", true);
+        if (S.type === "open_play" && S.mode === "public") {
+          if (PUB.reclub_url && S.reclub == null) return toast("Please tell us whether you're on Reclub.", true);
+          if ((!PUB.reclub_url || S.reclub === false) && S.names.slice(0, S.players).filter((x) => (x || "").trim()).length < S.players) return toast(`Please enter the names of all ${S.players} players.`, true);
+        }
+        S.step = 3; Flow.draw(); window.scrollTo({ top: 0 });
       },
       book: async (btn) => {
         btn.disabled = true; btn.textContent = "Booking…"; Flow.error = "";
         try {
           const res = S.type === "open_play"
-            ? await rpc("create_open_play_booking", { p_session_id: S.session, p_customer_name: S.name, p_players: S.players, p_customer_phone: S.phone || null, p_customer_email: null, p_notes: S.notes || null, p_source: S.source })
-            : await rpc("create_court_rental_booking", { p_customer_name: S.name, p_items: S.courts.map((id) => ({ court_id: id, starts_at: offISO(S.date, S.start), ends_at: offISO(S.date, S.start + S.dur) })), p_customer_phone: S.phone || null, p_customer_email: null, p_notes: S.notes || null, p_source: S.source });
-          const mode = S.mode; Flow.S = null;
+            ? await rpc("create_open_play_booking", { p_session_id: S.session, p_customer_name: S.name, p_players: S.players, p_customer_phone: S.phone || null, p_customer_email: null, p_notes: S.notes || null, p_source: S.source,
+                p_player_names: (S.reclub === true && S.mode === "public") ? [] : S.names.slice(0, S.players).map((x) => (x || "").trim()).filter(Boolean),
+                p_reclub: PUB.reclub_url ? S.reclub : (S.mode === "public" ? false : null), p_addons: addonArgs(S.addons) })
+            : await rpc("create_court_rental_booking", { p_customer_name: S.name, p_items: S.items.map((x) => ({ court_id: x.court_id, starts_at: offISO(S.date, x.s), ends_at: offISO(S.date, x.e) })), p_customer_phone: S.phone || null, p_customer_email: null, p_notes: S.notes || null, p_source: S.source, p_addons: addonArgs(S.addons) });
+          const mode = S.mode; Flow.S = null; Flow.avail = null;
           if (mode === "public") { rememberBooking(res.reference, res.access_token); nav(bookingLink(res.reference, res.access_token)); }
           else { toast(`Booked — ${res.reference}`); nav(S.type === "open_play" ? `#/staff/open-play?d=${S.date}` : `#/staff/courts?d=${S.date}`); setTimeout(() => Staff.openBooking(res.booking_id), 300); }
         } catch (e) {
           Flow.error = friendly(e);
-          if (/no longer available|SOLD OUT|remaining|passed|closed/i.test(Flow.error)) { S.step = 1; toast(Flow.error, true); }
+          if (/no longer available|SOLD OUT|remaining|passed|closed/i.test(Flow.error)) { S.step = 1; Flow.avail = null; toast(Flow.error, true); }
           Flow.draw();
         }
       },
@@ -918,27 +993,31 @@ const Staff = {
     const st = b.status, pend = sum(b.payments.filter((p) => p.status === "submitted"), (p) => p.amount), bal = Number(b.balance_due);
     const methods = Staff.methods || [];
     const counterOnly = !Staff.can("bookings.verify_payment");
-    const what = b.booking_type === "open_play" ? `Open Play · ${b.player_count} player${b.player_count > 1 ? "s" : ""}` : b.lines.map((l) => `${esc(l.court)} · ${fmtRange(l.starts_at, l.ends_at)}`).join("<br>");
+    const what = b.booking_type === "open_play" ? `Open Play · ${b.player_count} player${b.player_count > 1 ? "s" : ""}${b.session ? ` ${levelTag(b.session.level)}` : ""}` : b.lines.map((l) => `${esc(l.court)} · ${fmtRange(l.starts_at, l.ends_at)}`).join("<br>");
+    const full = fullPay(b.reservation_fee_pct), movable = ["pending_payment", "payment_submitted", "confirmed", "checked_in", "no_show"].includes(st);
     let action = "";
     if (m === "pay") {
       const opts = methods.filter((x) => x.is_active && (!counterOnly || x.kind === "cash"));
       const needFee = Math.max(b.reservation_fee_amount - b.amount_paid - pend, 0);
       action = `<form class="card stack" data-f="pay"><h3>Record a payment</h3>${counterOnly ? `<p class="muted" style="font-size:13px">You can record cash received at the counter. GCash and bank transfers are confirmed by a manager.</p>` : ""}
         <div class="grid g2">${field("Amount", money("amount", round2(needFee > 0 ? needFee : bal - pend), `required max="${bal - pend}"`), `Balance ${peso(bal - pend)}`)}${field("Paid via", sel("method", opts.map((x) => [x.id, x.name]), opts[0]?.id))}</div>
-        <div class="grid g2">${field("For", sel("kind", [["reservation", "Reservation fee"], ["balance", "Remaining balance"], ["full", "Full payment"]], needFee > 0 ? "reservation" : "balance"))}${field("Reference no.", inp("refno", "", 'placeholder="optional"'))}</div>
+        <div class="grid g2">${field("For", sel("kind", [["reservation", "Reservation fee"], ["balance", "Remaining balance"], ["full", "Full payment"]], needFee > 0 ? (full ? "full" : "reservation") : "balance"))}${field("Reference no.", inp("refno", "", 'placeholder="optional"'))}</div>
         <div class="row"><button class="btn">Save payment</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     }
     if (m === "reject") action = `<form class="card stack" data-f="reject"><h3>Reject payment</h3>${field("Reason (the customer sees this)", inp("reason", "", 'required placeholder="e.g. Screenshot unreadable, amount doesn\'t match"'))}<div class="row"><button class="btn bad">Reject</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     if (m === "checkin") action = `<form class="card stack" data-f="checkin"><h3>Check in</h3>${b.booking_type === "open_play" ? field(`Players who arrived (of ${b.player_count})`, `<input class="in num" type="number" name="players" min="0" max="${b.player_count}" value="${b.players_checked_in ?? b.player_count}">`) : ""}${bal > 0 ? notice(`Balance of <b>${peso(bal)}</b> still to collect.`, "warn") : ""}<div class="row"><button class="btn">${ic("check")} Check in</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     if (m === "cancel" && b.quote) {
       const q = b.quote;
-      const txt = { refundable: `Cancelled ${Math.floor(q.hours_before / 24)} days ahead — refundable (${q.refund_pct}% of what was paid).`, forfeit: `Less than the no-refund window — the reservation fee is kept.`, admin_decides: `In the in-between window — you decide the refund.` }[q.tier];
+      const txt = { refundable: `Cancelled ${Math.floor(q.hours_before / 24)} days ahead — refundable (${q.refund_pct}% of what was paid).`, forfeit: `Less than the no-refund window — what was paid is kept.`, admin_decides: `In the in-between window — you decide the refund.` }[q.tier];
       action = `<form class="card stack" data-f="cancel"><h3>Cancel booking</h3>${notice(`${txt} Paid so far: <b>${peso(q.amount_paid)}</b>. Starts ${relTime(b.starts_at)}.`, q.tier === "forfeit" ? "warn" : "")}
         ${field("Refund amount", money("refund", q.suggested_refund ?? "", `max="${q.amount_paid}"`), q.suggested_refund != null ? `Suggested ${peso(q.suggested_refund)}${q.allow_override ? " — change it to override" : ""}` : "Enter ₱0 to keep everything paid.")}
         ${field("Reason", `<textarea class="in" name="reason" required placeholder="e.g. Customer called — rain"></textarea>`)}
         <div class="row"><button class="btn bad">Cancel & release the court</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     }
     if (m === "refund") action = `<form class="card stack" data-f="refund"><h3>Record refund paid out</h3>${field("Amount", money("amount", b.refund_due || "", `max="${b.amount_paid}"`))}${field("Paid via", sel("method", methods.filter((x) => x.is_active).map((x) => [x.id, x.name])))}${field("Reference no.", inp("refno", ""))}${receiptField("Transfer receipt (optional)")}<div class="row"><button class="btn">Record refund</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
+    if (m === "move") action = Staff.moveForm(b);
+    if (m === "extendtime") action = Staff.extendForm(b);
+    if (m === "players") action = `<form class="card stack" data-f="players"><h3>Player names</h3>${field(`One name per line (up to ${b.player_count})`, `<textarea class="in" name="names" rows="${Math.min(12, b.player_count + 1)}" placeholder="Juan Dela Cruz">${esc((b.player_names || []).join("\n"))}</textarea>`)}<div class="row"><button class="btn">Save names</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     if (m === "extend") action = `<form class="card stack" data-f="extend"><h3>Give more time to pay</h3>${field("Add", suffix("hours", 4, "hours", 'min="1" max="168"'))}<div class="row"><button class="btn">Extend</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
     const btns = [];
     if (!m) {
@@ -947,6 +1026,10 @@ const Staff = {
       if (Staff.can("bookings.checkin") && st === "checked_in") btns.push(`<button class="btn sec" data-a="outcome" data-to="completed">Mark completed</button>`);
       if (Staff.can("bookings.checkin") && st === "confirmed" && new Date(b.starts_at) < Date.now()) btns.push(`<button class="btn sec" data-a="outcome" data-to="no_show">No show</button>`);
       if (Staff.can("bookings.verify_payment") && st === "pending_payment") btns.push(`<button class="btn sec" data-a="mode" data-m="extend">Give more time</button>`);
+      if (Staff.can("equipment.rent") && ["confirmed", "checked_in"].includes(st) && (b.addons || []).some((a) => a.handed_out < a.quantity)) btns.push(`<button class="btn sec" data-a="handout">${ic("paddle")} Hand out add-ons</button>`);
+      if (Staff.can("bookings.manage") && movable && b.booking_type === "court_rental") btns.push(`<button class="btn sec" data-a="mode" data-m="extendtime">Extend hours</button>`);
+      if (Staff.can("bookings.manage") && movable && !(b.booking_type === "open_play" && st === "checked_in")) btns.push(`<button class="btn sec" data-a="mode" data-m="move">Reschedule</button>`);
+      if (b.booking_type === "open_play" && (Staff.can("bookings.manage") || Staff.can("bookings.checkin")) && !["cancelled", "expired"].includes(st)) btns.push(`<button class="btn ghost" data-a="mode" data-m="players">Player names</button>`);
       if (Staff.can("bookings.cancel") && b.quote) btns.push(`<button class="btn ghost" data-a="mode" data-m="cancel">Cancel booking</button>`);
       if (Staff.can("bookings.cancel") && st === "cancelled" && Number(b.refund_due) > 0) btns.push(`<button class="btn" data-a="mode" data-m="refund">Record refund (${peso(b.refund_due)} due)</button>`);
     }
@@ -964,11 +1047,13 @@ const Staff = {
       <div class="card"><dl class="kv"><dt>Customer</dt><dd>${esc(b.customer_name)}${b.customer_phone ? `<br><span class="mono" style="font-weight:500">${esc(b.customer_phone)}</span>` : ""}</dd>
         <dt>Date</dt><dd>${fmtDate(b.business_date, { weekday: "long", month: "long", day: "numeric" })}</dd><dt>Time</dt><dd>${fmtRange(b.starts_at, b.ends_at)}</dd>
         <dt>${b.booking_type === "open_play" ? "Session" : "Courts"}</dt><dd>${what}</dd>
+        ${b.booking_type === "open_play" ? `<dt>Players</dt><dd style="font-weight:500">${(b.player_names || []).length ? b.player_names.map(esc).join(", ") : b.reclub_member ? "On Reclub — names are in Reclub" : "—"}${b.reclub_member === true ? ` <span class="tag lvl">RECLUB</span>` : b.reclub_member === false ? ` <span class="tag" title="Not on Reclub yet — add this group to Reclub">ADD TO RECLUB</span>` : ""}</dd>` : ""}
+        ${(b.addons || []).length ? `<dt>Add-ons</dt><dd style="font-weight:500">${b.addons.map((a) => `${esc(a.name)} × ${a.quantity} · ${peso(a.line_total)}${a.handed_out >= a.quantity ? ` <span class="tag lvl">HANDED OUT</span>` : ""}`).join("<br>")}</dd>` : ""}
         ${b.booking_type === "open_play" && b.players_checked_in != null ? `<dt>Checked in</dt><dd>${b.players_checked_in} of ${b.player_count}</dd>` : ""}
         <dt>Booked</dt><dd style="font-weight:500">${fmtDT(b.created_at)} · ${esc({ online: "online by customer", walk_in: "walk-in", phone: "phone / Messenger", reclub: "Reclub", admin: "admin" }[b.source] || b.source)}${b.created_by_name ? ` (${esc(b.created_by_name)})` : ""}</dd>
         ${b.notes ? `<dt>Notes</dt><dd style="font-weight:500">${esc(b.notes)}</dd>` : ""}</dl></div>
       ${Staff.msgLine(b)}
-      <div class="card"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd><dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd><dt>Paid (confirmed)</dt><dd>${peso(b.amount_paid)}</dd>
+      <div class="card"><dl class="kv num"><dt>Total</dt><dd>${peso(b.total_amount)}</dd>${full ? "" : `<dt>Reservation fee (${Number(b.reservation_fee_pct)}%)</dt><dd>${peso(b.reservation_fee_amount)}</dd>`}<dt>Paid (confirmed)</dt><dd>${peso(b.amount_paid)}</dd>
         ${pend ? `<dt>Waiting for review</dt><dd style="color:var(--info)">${peso(pend)}</dd>` : ""}${Number(b.amount_refunded) ? `<dt>Refunded</dt><dd>${peso(b.amount_refunded)}</dd>` : ""}
         <dt>Outstanding</dt><dd style="color:${bal > 0 ? "var(--warn)" : "var(--g7)"}">${st === "cancelled" || st === "expired" ? "—" : peso(bal)}</dd></dl></div>
       ${b.cancelled_at ? notice(`Cancelled ${fmtDT(b.cancelled_at)}${b.cancelled_by_name ? ` by ${esc(b.cancelled_by_name)}` : ""}. Reason: “${esc(b.cancellation_reason)}”. Refund due: ${peso(b.refund_due || 0)}.`, "warn") : ""}
@@ -976,11 +1061,77 @@ const Staff = {
       <div><h3 style="margin-bottom:8px">Payments</h3><div class="stack" style="gap:8px">${pays}</div></div>
     </div>`;
   },
+  repriceBox() { return `<label class="check"><input type="checkbox" name="reprice" checked> Charge the new price (any difference is paid at the counter)</label>${field("Reason (optional)", inp("reason", "", 'placeholder="e.g. Customer asked to move to Friday"'))}`; },
+  moveForm(b) {
+    const D = Staff.drawer.mv; if (!D) return "";
+    if (b.booking_type === "open_play") {
+      const list = (D.sessions || []).filter((x) => x.id !== b.session?.id && x.status === "open" && new Date(x.ends_at) > Date.now() && x.remaining >= b.player_count);
+      return `<form class="card stack" data-f="move"><h3>Reschedule</h3><p class="muted" style="font-size:13px">Move this group (${b.player_count} player${b.player_count > 1 ? "s" : ""}) to another session.</p>
+        ${field("Date", `<input class="in" type="date" name="date" value="${D.date}" data-a="mvdate">`)}
+        ${list.length ? field("New session", sel("session", list.map((x) => [x.id, `${fmtRange(x.starts_at, x.ends_at)} · ${levelLabel(x.level)} · ${x.remaining} spots left`]), list[0].id)) : `<p class="muted">No other session on this day has room for ${b.player_count}.</p>`}
+        ${Staff.repriceBox()}
+        <div class="row"><button class="btn" ${list.length ? "" : "disabled"}>Move booking</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
+    }
+    const slot = Number(PUB.rental_slot_minutes) || 30, len = Number(PUB.operating_minutes), offs = [];
+    for (let x = 0; x <= len; x += slot) offs.push(x);
+    const courts = (Staff.courtList || []).filter((c) => c.status !== "inactive");
+    return `<form class="card stack" data-f="move"><h3>Reschedule</h3><p class="muted" style="font-size:13px">Choose the new date, court and times. The old times are freed when you save.</p>
+      ${field("Date", `<input class="in" type="date" name="date" value="${D.date}" required>`)}
+      ${D.lines.map((l, i) => `<div class="sub stack" style="gap:6px"><div class="grid g3">${field("Court", sel("c_" + i, courts.map((c) => [c.id, c.name]), l.court))}${field("From", sel("s_" + i, offs.slice(0, -1).map((x) => [x, offClock(x)]), l.s))}${field("Until", sel("e_" + i, offs.slice(1).map((x) => [x, offClock(x)]), l.e))}</div>${D.lines.length > 1 ? `<button type="button" class="btn ghost sm" data-a="mvdel" data-i="${i}" style="align-self:flex-start">Remove this court</button>` : ""}</div>`).join("")}
+      <button type="button" class="btn ghost sm" data-a="mvadd" style="align-self:flex-start">${ic("plus")} Add a court</button>
+      ${Staff.repriceBox()}
+      <div class="row"><button class="btn">Save new schedule</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
+  },
+  extendForm(b) {
+    const D = Staff.drawer.mv; if (!D) return "";
+    const slot = Number(PUB.rental_slot_minutes) || 30, len = Number(PUB.operating_minutes);
+    return `<form class="card stack" data-f="extendtime"><h3>Extend hours</h3><p class="muted" style="font-size:13px">Pick the new end time. The extra time is charged at the normal court rate and added to the balance.</p>
+      ${D.lines.map((l, i) => { const opts = []; for (let x = l.e + slot; x <= len; x += slot) opts.push([x, `${offClock(x)} (+${round2((x - l.e) / 60)} h)`]);
+        const name = (Staff.courtList || []).find((c) => c.id === l.court)?.name || "Court";
+        return field(`${esc(name)} · now ${offClock(l.s)} – ${offClock(l.e)}`, opts.length ? sel("e_" + i, [[l.e, "No change"], ...opts], D.lines.length === 1 ? opts[0][0] : l.e) : `<p class="muted" style="margin:4px 0 0">Already runs until closing time.</p>`); }).join("")}
+      ${field("Reason (optional)", inp("reason", "", 'placeholder="e.g. Group asked for one more hour"'))}
+      <div class="row"><button class="btn">Extend</button><button type="button" class="btn ghost" data-a="mode">Back</button></div></form>`;
+  },
   drawerBind(root) {
     const b = Staff.drawer.b; if (!b) return;
+    const readMove = () => {
+      const f = root.querySelector("form[data-f=move]"), D = Staff.drawer.mv; if (!f || !D?.lines) return;
+      const d = formData(f); D.date = d.date || D.date;
+      D.lines = D.lines.map((l, i) => ({ court: d["c_" + i] ?? l.court, s: Number(d["s_" + i] ?? l.s), e: Number(d["e_" + i] ?? l.e) }));
+    };
+    const moved = (r) => `Saved. Total ${peso(r.total)}${Number(r.balance_due) > 0 ? ` — ${peso(r.balance_due)} to collect` : ""}.`;
     const again = async (ok) => { if (ok !== undefined) { Staff.drawer.mode = null; await Staff.reloadBooking(); Staff.refreshPage?.(); } };
     wire(root, {
-      mode: (el) => { Staff.drawer.mode = el.dataset.m || null; renderModal(); },
+      mode: async (el) => {
+        const m = el.dataset.m || null;
+        if (m === "move" || m === "extendtime") {
+          const ok = await run(async () => {
+            if (b.booking_type === "court_rental") {
+              if (!Staff.courtList) Staff.courtList = await q(sb.from("courts").select("id,name,status,sort_order").order("sort_order"));
+              Staff.drawer.mv = { date: b.business_date, lines: b.lines.map((l) => ({ court: l.court_id, s: isoOff(b.business_date, l.starts_at), e: isoOff(b.business_date, l.ends_at) })) };
+            } else Staff.drawer.mv = { date: b.business_date, sessions: await rpc("get_open_play_sessions", { p_date: b.business_date }) };
+          });
+          if (!ok) return;
+        }
+        Staff.drawer.mode = m; renderModal();
+      },
+      mvdate: async (el) => { const D = Staff.drawer.mv; D.date = el.value; D.sessions = await run(() => rpc("get_open_play_sessions", { p_date: el.value })) || []; renderModal(); },
+      mvadd: () => { readMove(); const D = Staff.drawer.mv, last = D.lines[D.lines.length - 1], used = D.lines.map((l) => l.court); const free = (Staff.courtList || []).find((c) => c.status === "active" && !used.includes(c.id)); if (!free) return toast("Every court is already in this booking.", true); D.lines.push({ court: free.id, s: last.s, e: last.e }); renderModal(); },
+      mvdel: (el) => { readMove(); Staff.drawer.mv.lines.splice(Number(el.dataset.i), 1); renderModal(); },
+      move: async (f, d) => {
+        const reprice = d.reprice === "on";
+        if (b.booking_type === "open_play") return again(await run(() => rpc("reschedule_booking", { p_booking_id: b.id, p_items: null, p_session_id: d.session, p_reprice: reprice, p_reason: d.reason || null }), moved));
+        readMove(); const D = Staff.drawer.mv;
+        if (D.lines.some((l) => l.e <= l.s)) return toast("Each “Until” time must be after its “From” time.", true);
+        again(await run(() => rpc("reschedule_booking", { p_booking_id: b.id, p_items: D.lines.map((l) => ({ court_id: l.court, starts_at: offISO(D.date, l.s), ends_at: offISO(D.date, l.e) })), p_session_id: null, p_reprice: reprice, p_reason: d.reason || null }), moved));
+      },
+      extendtime: async (f, d) => {
+        const D = Staff.drawer.mv, lines = D.lines.map((l, i) => ({ ...l, e: Number(d["e_" + i] ?? l.e) }));
+        if (lines.every((l, i) => l.e === D.lines[i].e)) return toast("Choose a later end time first.", true);
+        again(await run(() => rpc("reschedule_booking", { p_booking_id: b.id, p_items: lines.map((l) => ({ court_id: l.court, starts_at: offISO(D.date, l.s), ends_at: offISO(D.date, l.e) })), p_session_id: null, p_reprice: true, p_reason: d.reason || "Extended hours" }), (r) => `Extended. ${Number(r.balance_due) > 0 ? `${peso(r.balance_due)} to collect.` : "Nothing more to pay."}`));
+      },
+      players: async (f, d) => again(await run(() => rpc("set_booking_players", { p_booking_id: b.id, p_names: d.names.split(/\n/).map((x) => x.trim()).filter(Boolean) }), "Player names saved.")),
+      handout: async () => again(await run(() => rpc("hand_out_booking_addons", { p_booking_id: b.id }), (r) => `Handed out ${r.handed_out} item${r.handed_out === 1 ? "" : "s"}. Mark them returned under Equipment Rentals.`)),
       rejectm: (el) => { Staff.drawer.mode = "reject"; Staff.drawer.pay = el.dataset.id; renderModal(); },
       proof: async (el) => {
         const box = el.nextElementSibling?.classList.contains("proof-view") ? el.nextElementSibling : null;
@@ -1035,7 +1186,7 @@ const openBookingAct = (el) => Staff.openBooking(el.dataset.id);
 
 // ---------------------------------------------------------------- Dashboard
 Views.dashboard = async (root) => {
-  const [d, queue] = await Promise.all([rpc("staff_dashboard"), rpc("staff_payment_queue")]);
+  const [d, queue, bills] = await Promise.all([rpc("staff_dashboard"), rpc("staff_payment_queue"), Staff.can("expenses.view_all") ? rpc("staff_bills_due").catch(() => []) : Promise.resolve([])]);
   await loadMethods();
   const toCheck = queue.length;
   Staff.refreshPage = () => Views.dashboard(root);
@@ -1052,13 +1203,14 @@ Views.dashboard = async (root) => {
     <div class="card stat ${d.low_stock.length ? "warn" : ""}"><div class="l">Low stock</div><div class="v num">${d.low_stock.length}</div><div class="d">${esc(d.low_stock.slice(0, 2).map((x) => x.name.replace(" [DEMO]", "")).join(", ") || "All stocked")}</div></div>
   </div>
   ${payQueueHTML(queue)}
+  ${billsHTML(bills)}
   ${day ? `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Today's courts</h2><a class="btn ghost sm" href="#/staff/courts">Court rentals ${ic("arrow")}</a></div>${schedGrid(day, true)}</div>` : ""}
   <div class="grid g2" style="margin-top:14px">
     <div class="card"><h2>Booking summary</h2><dl class="kv num">${["pending_payment", "payment_submitted", "confirmed", "checked_in", "completed", "cancelled", "no_show"].map((s) => `<dt>${STATUS_LABEL[s]}</dt><dd>${d.bookings[s]}</dd>`).join("")}</dl></div>
     <div class="card"><h2>Recent transactions</h2>${d.recent.length ? `<div class="stack" style="gap:9px">${d.recent.slice(0, 8).map((t) => `<div class="row" style="flex-wrap:nowrap;${t.booking_id ? "cursor:pointer" : ""}" ${t.booking_id ? `data-a="open" data-id="${t.booking_id}"` : ""}><div style="flex:1;min-width:0"><b>${esc(t.what)}</b><div class="muted" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.detail || "")}</div></div><div style="text-align:right"><b class="num">${t.voided ? "Voided" : peso(t.amount)}</b><div class="muted" style="font-size:12px">${esc(t.method || "")} · ${fmtT(t.at)}</div></div></div>`).join("")}</div>` : `<p class="empty">No sales or payments yet today.</p>`}</div>
   </div>
   ${rev ? `<div class="card" style="margin-top:14px"><h2>Revenue breakdown · today</h2>${Object.keys(BUCKET_LABEL).map((k) => `<div style="display:grid;grid-template-columns:120px 1fr 90px;gap:10px;align-items:center;margin:6px 0"><span class="muted">${BUCKET_LABEL[k]}</span><div class="bar"><i style="width:${((rev[k] || 0) / maxB) * 100}%"></i></div><b class="num" style="text-align:right">${peso(rev[k] || 0)}</b></div>`).join("")}<p class="muted" style="font-size:12.5px;margin-top:8px">Bookings count on the day they're played, at full price. The reservation fee isn't counted twice.</p></div>` : ""}`;
-  wire(root, { open: openBookingAct, posck: (el) => openPosCheck(queue.find((x) => x.id === el.dataset.id), () => Views.dashboard(root)) });
+  wire(root, { open: openBookingAct, posck: (el) => openPosCheck(queue.find((x) => x.id === el.dataset.id), () => Views.dashboard(root)), billpay: (el) => openBillPay(bills[Number(el.dataset.i)], () => Views.dashboard(root)) });
 };
 
 // One list for every payment that needs a manager's eye: customer payment proofs (Open Play / Court Rental) and non-cash POS sales
@@ -1073,6 +1225,38 @@ function payQueueHTML(queue) {
     ${queue.map((x) => `<tr class="click" ${x.kind === "pos" ? `data-a="posck" data-id="${x.id}"` : `data-a="open" data-id="${x.booking_id}"`}><td class="ref">${esc(x.reference)}</td><td>${QTYPE[x.type] || ""}</td><td>${esc(x.customer || "—")}</td>
       <td class="muted" style="font-size:13px;max-width:240px">${x.kind === "pos" ? esc(x.detail || "") : `${esc(x.detail || "")} · ${fmtDate(x.date)}`}${x.note ? `<br><span style="color:var(--bad)">${esc(x.note)}</span>` : ""}</td>
       <td class="r num">${peso(x.amount)}</td><td>${esc(x.method || "")}${x.reference_no ? ` <span class="mono muted">${esc(x.reference_no)}</span>` : ""}</td><td>${relTime(x.sent_at)}</td><td>${pill(x)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+// Monthly bills (rent, utilities…) set up under Expenses; paying one records the expense with its proof
+function billsHTML(bills) {
+  if (!Staff.can("expenses.view_all")) return "";
+  if (!bills.length) return `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Monthly bills</h2><span class="muted" style="font-size:13.5px">${ic("check")} Nothing due soon · <a href="#/staff/expenses">${Staff.can("settings.manage") ? "Set up bills" : "Expenses"}</a></span></div></div>`;
+  return `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Monthly bills <span class="muted num" style="font-size:15px">(${bills.length})</span></h2><a class="btn ghost sm" href="#/staff/expenses">Manage ${ic("arrow")}</a></div>
+    <div class="stack" style="gap:8px">${bills.map((x, i) => `<div class="sub row" style="justify-content:space-between;gap:10px"><div style="min-width:0"><b>${esc(x.name)}</b> <span class="muted">· ${fmtDate(x.period, { month: "long", year: "numeric" })}</span>
+      <div class="muted" style="font-size:13px">${x.status === "overdue" ? `<b style="color:var(--bad)">Overdue — was due ${fmtDate(x.due_date)}</b>` : x.status === "today" ? `<b style="color:var(--warn)">Due today</b>` : `Due ${fmtDate(x.due_date)} · in ${x.days} day${x.days === 1 ? "" : "s"}`}${x.vendor ? ` · ${esc(x.vendor)}` : ""}</div></div>
+      <div class="row" style="gap:10px"><b class="num">${x.amount ? peso(x.amount) : `<span class="muted" style="font-weight:600">Amount varies</span>`}</b><button class="btn sm" data-a="billpay" data-i="${i}">Pay</button></div></div>`).join("")}</div></div>`;
+}
+function openBillPay(x, after) {
+  if (!x) return;
+  const methods = (Staff.methods || []).filter((m) => m.is_active);
+  openModal({ center: true, render: () => `${mhead(esc(x.name), `Monthly bill · ${fmtDate(x.period, { month: "long", year: "numeric" })}`)}
+    <form class="stack" data-f="bp"><div class="grid g2">${field("Amount paid", money("amount", x.amount || "", "required"))}${field("Date paid", `<input class="in" type="date" name="paid_on" value="${PUB.today}" required>`)}</div>
+      ${field("Paid via", sel("method", methods.map((m) => [m.id, m.name]), x.payment_method_id || methods[0]?.id))}
+      ${receiptField("Proof of payment")}${field("Notes (optional)", inp("notes", ""))}
+      <p class="muted" style="font-size:13px;margin:0">Saving adds this to Expenses (${esc(x.category)}) with the proof attached.</p>
+      <button class="btn">Save payment</button></form>
+    <details class="sub" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">Not paying this month?</summary><form class="stack" data-f="bskip" style="margin-top:10px">${field("Why", inp("note", "", 'required placeholder="e.g. Landlord waived this month"'))}<button class="btn sec">Skip this month</button></form></details>`,
+    bind: (m) => wire(m, {
+      bp: async (f, d) => {
+        const ok = await run(async () => {
+          if (!(Number(d.amount) > 0)) fail("Enter the amount paid.");
+          if (!d.receipt || !d.receipt.size) fail("Please attach the proof of payment.");
+          const path = await uploadReceipt("expense", d.receipt);
+          return rpc("pay_recurring_bill", { p_bill_id: x.bill_id, p_period: x.period, p_amount: Number(d.amount), p_paid_on: d.paid_on, p_payment_method_id: d.method || null, p_receipt_path: path, p_notes: d.notes || null });
+        }, "Paid — added to Expenses.");
+        if (ok) { closeModal(); after(); }
+      },
+      bskip: async (f, d) => { const ok = await run(() => rpc("skip_recurring_bill", { p_bill_id: x.bill_id, p_period: x.period, p_note: d.note }), "Skipped for this month."); if (ok) { closeModal(); after(); } },
+    }) });
 }
 function openPosCheck(x, after) {
   if (!x) return;
@@ -1137,13 +1321,15 @@ Views["open-play"] = async (root, params) => {
     <div class="stack">${day.sessions.map((s) => {
       const live = s.players.filter((b) => !["cancelled", "expired"].includes(b.status));
       const inCount = sum(live.filter((b) => ["checked_in", "completed"].includes(b.status)), (b) => b.players_checked_in ?? b.players);
-      return `<div class="card"><div class="row" style="justify-content:space-between"><div><h2 style="margin:0">${fmtRange(s.starts_at, s.ends_at)}</h2><p class="muted">${s.booked} / ${s.capacity} spots booked · ${Math.max(s.capacity - s.booked, 0)} remaining · ${inCount} checked in · ${peso(s.price)} per player</p></div>${s.capacity > 0 && s.booked >= s.capacity ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : ""}</div>
+      return `<div class="card"><div class="row" style="justify-content:space-between"><div><div class="row" style="gap:8px"><h2 style="margin:0">${fmtRange(s.starts_at, s.ends_at)}</h2>${levelTag(s.level)}</div><p class="muted">${s.booked} / ${s.capacity} spots booked · ${Math.max(s.capacity - s.booked, 0)} remaining · ${inCount} checked in · ${peso(s.price)} per player</p></div>${s.capacity > 0 && s.booked >= s.capacity ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : ""}</div>
         <div class="bar" style="margin:10px 0 14px"><i style="width:${s.capacity ? Math.min(100, (s.booked / s.capacity) * 100) : 0}%"></i></div>
-        ${canCourts ? `<form class="row" data-f="courts" data-sid="${s.id}" style="margin-bottom:12px"><span class="muted" style="font-size:13px">Courts used:</span>${day.courts.map((c) => `<label class="check" style="align-items:center"><input type="checkbox" name="c" value="${c.id}" ${s.courts.includes(c.id) ? "checked" : ""}> ${esc(c.name)}</label>`).join("")}<button class="btn sec sm">Save</button><span class="muted" style="font-size:12.5px">${s.per_court} players per court</span></form>` : `<p class="muted" style="font-size:13px;margin-bottom:10px">Courts: ${esc(day.courts.filter((c) => s.courts.includes(c.id)).map((c) => c.name).join(", ") || "none")}</p>`}
-        ${s.players.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Name</th><th>Reference</th><th class="r">Players</th><th class="r">Checked in</th><th>Status</th><th class="r">Balance</th><th></th></tr></thead><tbody>${s.players.map((b) => `<tr><td>${esc(b.customer_name)}</td><td class="ref">${esc(b.reference)}</td><td class="r num">${b.players}</td><td class="r num">${b.players_checked_in ?? "—"}</td><td>${statusPill(b.status)}</td><td class="r num">${["cancelled", "expired"].includes(b.status) ? "—" : peso(b.balance_due)}</td><td><button class="btn sm ${b.status === "confirmed" ? "" : "sec"}" data-a="open" data-id="${b.id}">${b.status === "confirmed" ? "Check in" : "Open"}</button></td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">No players booked yet.</p>`}
+        ${canCourts ? `<form class="row" data-f="courts" data-sid="${s.id}" style="margin-bottom:12px"><span class="muted" style="font-size:13px">Courts used:</span>${day.courts.map((c) => `<label class="check" style="align-items:center"><input type="checkbox" name="c" value="${c.id}" ${s.courts.includes(c.id) ? "checked" : ""}> ${esc(c.name)}</label>`).join("")}<button class="btn sec sm">Save</button><span class="muted" style="font-size:12.5px">${s.per_court} players per court</span></form>
+        <div class="row" style="margin-bottom:12px"><span class="muted" style="font-size:13px">Level:</span>${sel("level", LEVELS, s.level, `data-a="lvl" data-sid="${s.id}" id="lvl-${s.id}" style="width:auto;min-height:36px"`)}<span class="muted" style="font-size:12.5px">This day only — the regular level is in Settings.</span></div>` : `<p class="muted" style="font-size:13px;margin-bottom:10px">Courts: ${esc(day.courts.filter((c) => s.courts.includes(c.id)).map((c) => c.name).join(", ") || "none")}</p>`}
+        ${s.players.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Name</th><th>Reference</th><th class="r">Players</th><th class="r">Checked in</th><th>Status</th><th class="r">Balance</th><th></th></tr></thead><tbody>${s.players.map((b) => `<tr><td>${esc(b.customer_name)}${b.reclub_member ? ` <span class="tag lvl">RECLUB</span>` : ""}${(b.player_names || []).length ? `<div class="muted" style="font-size:12.5px;max-width:280px">${b.player_names.map(esc).join(", ")}</div>` : ""}</td><td class="ref">${esc(b.reference)}</td><td class="r num">${b.players}</td><td class="r num">${b.players_checked_in ?? "—"}</td><td>${statusPill(b.status)}</td><td class="r num">${["cancelled", "expired"].includes(b.status) ? "—" : peso(b.balance_due)}</td><td><button class="btn sm ${b.status === "confirmed" ? "" : "sec"}" data-a="open" data-id="${b.id}">${b.status === "confirmed" ? "Check in" : "Open"}</button></td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">No players booked yet.</p>`}
       </div>`; }).join("")}</div>`;
   wire(root, {
     open: openBookingAct, pickdate,
+    lvl: async (el) => { const ok = await run(() => rpc("set_open_play_session_level", { p_session: el.dataset.sid, p_level: el.value }), "Level saved."); if (ok) Views["open-play"](root, params); },
     courts: async (f) => { const courts = new FormData(f).getAll("c"); const ok = await run(() => rpc("set_open_play_session_courts", { p_session: f.dataset.sid, p_courts: courts }), (r) => `Saved — capacity ${r.capacity} players.`); if (ok) Views["open-play"](root, params); },
   });
 };
@@ -1358,12 +1544,14 @@ Views.expenses = async (root, params) => {
   const [y, mo] = month.split("-").map(Number), last = new Date(Date.UTC(y, mo, 0)).getUTCDate();
   const from = `${month}-01`, to = `${month}-${String(last).padStart(2, "0")}`;
   const all = Staff.can("expenses.view_all");
-  const [cats, list, methods, sal] = await Promise.all([
+  const [cats, list, methods, sal, bills] = await Promise.all([
     q(sb.from("expense_categories").select("*").order("sort_order")),
     q(sb.from("expenses").select("*").gte("expense_date", from).lte("expense_date", to).order("expense_date", { ascending: false })),
     loadMethods(),
     all ? q(sb.from("expense_salary_details").select("*")) : Promise.resolve([]),
+    all ? q(sb.from("recurring_bills").select("*").order("sort_order").order("name")).catch(() => []) : Promise.resolve([]),
   ]);
+  const canBills = Staff.can("settings.manage");
   const catName = (id) => cats.find((c) => c.id === id)?.name || "—";
   const live = list.filter((e) => e.status !== "void"), t = (ty) => sum(live.filter((e) => e.expense_type === ty), (e) => e.amount);
   const usable = cats.filter((c) => c.is_active && (all || c.staff_allowed));
@@ -1371,10 +1559,26 @@ Views.expenses = async (root, params) => {
     <div class="row" style="margin-bottom:14px"><input class="in" type="month" value="${month}" data-a="month" style="width:auto" aria-label="Month"></div>
     ${all ? `<div class="grid g4" style="margin-bottom:14px"><div class="card stat"><div class="l">Total</div><div class="v num">${peso(sum(live, (e) => e.amount))}</div></div><div class="card stat"><div class="l">Operating</div><div class="v num">${peso(t("operating"))}</div></div><div class="card stat"><div class="l">Capital</div><div class="v num">${peso(t("capital"))}</div></div><div class="card stat"><div class="l">Inventory-type</div><div class="v num">${peso(t("inventory"))}</div><div class="d">Left out of the P&L</div></div></div>` : `<div style="margin-bottom:14px">${notice("You see the expenses you've recorded yourself.")}</div>`}
     <div class="card"><div class="scroll-x"><table class="t"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Vendor / payee</th><th>Type</th><th class="r">Amount</th><th>Receipt</th><th></th></tr></thead><tbody>
-    ${list.map((e) => { const s = sal.find((x) => x.expense_id === e.id); return `<tr style="${e.status === "void" ? "opacity:.5" : ""}"><td>${fmtDate(e.expense_date)}</td><td>${esc(catName(e.category_id))}</td><td>${esc(e.description)}${s ? `<div class="muted" style="font-size:12.5px">${esc(s.employee_name)} · ${fmtDate(s.period_start, { month: "short", day: "numeric" })}–${fmtDate(s.period_end, { month: "short", day: "numeric" })} · gross ${peso(s.gross_salary)}${Number(s.adjustments) ? `, adj. ${peso(s.adjustments)}` : ""}</div>` : ""}${e.status === "void" ? ` <span class="tag">VOID: ${esc(e.void_reason)}</span>` : ""}</td><td>${esc(e.vendor || "")}</td><td><span class="tag">${esc(e.expense_type)}</span></td><td class="r num">${peso(e.amount)}</td><td>${receiptCell("expense", e.id, e.receipt_path, e.status !== "void")}</td><td>${all && e.status !== "void" ? `<button type="button" class="btn ghost sm" data-a="void" data-id="${e.id}">Void</button>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="8" class="empty">No expenses this month.</td></tr>`}</tbody></table></div></div>`;
+    ${list.map((e) => { const s = sal.find((x) => x.expense_id === e.id); return `<tr style="${e.status === "void" ? "opacity:.5" : ""}"><td>${fmtDate(e.expense_date)}</td><td>${esc(catName(e.category_id))}</td><td>${esc(e.description)}${s ? `<div class="muted" style="font-size:12.5px">${esc(s.employee_name)} · ${fmtDate(s.period_start, { month: "short", day: "numeric" })}–${fmtDate(s.period_end, { month: "short", day: "numeric" })} · gross ${peso(s.gross_salary)}${Number(s.adjustments) ? `, adj. ${peso(s.adjustments)}` : ""}</div>` : ""}${e.status === "void" ? ` <span class="tag">VOID: ${esc(e.void_reason)}</span>` : ""}</td><td>${esc(e.vendor || "")}</td><td><span class="tag">${esc(e.expense_type)}</span></td><td class="r num">${peso(e.amount)}</td><td>${receiptCell("expense", e.id, e.receipt_path, e.status !== "void")}</td><td>${all && e.status !== "void" ? `<button type="button" class="btn ghost sm" data-a="void" data-id="${e.id}">Void</button>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="8" class="empty">No expenses this month.</td></tr>`}</tbody></table></div></div>
+    ${all ? `<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between;margin-bottom:8px"><div><h2 style="margin:0">Monthly bills</h2><p class="muted" style="font-size:13.5px;margin:2px 0 0">Rent, utilities, internet… They appear on the dashboard before they're due. Paying one adds it to Expenses with the proof attached.</p></div>${canBills ? `<button type="button" class="btn sec sm" data-a="billnew">${ic("plus")} Add monthly bill</button>` : ""}</div>
+      ${bills.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>Bill</th><th>Category</th><th class="r">Amount</th><th>Due</th><th>Reminder</th><th>Status</th><th></th></tr></thead><tbody>${bills.map((x) => `<tr style="${x.is_active ? "" : "opacity:.55"}"><td><b>${esc(x.name)}</b>${x.vendor ? `<div class="muted" style="font-size:12.5px">${esc(x.vendor)}</div>` : ""}</td><td>${esc(catName(x.category_id))}</td><td class="r num">${x.amount ? peso(x.amount) : `<span class="muted">varies</span>`}</td><td>Day ${x.due_day} of the month</td><td>${x.remind_days_before} day${x.remind_days_before === 1 ? "" : "s"} before</td><td>${x.is_active ? `<span class="pill st-confirmed">Active</span>` : `<span class="pill st-cancelled">Paused</span>`}</td><td>${canBills ? `<button type="button" class="btn ghost sm" data-a="billedit" data-id="${x.id}">Edit</button>` : ""}</td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">No monthly bills yet.${canBills ? " Add rent, electricity, water, internet and other regular payments so you get a reminder." : ""}</p>`}</div>` : ""}`;
+  const billForm = (x = {}) => openModal({ render: () => `${mhead(x.id ? "Edit monthly bill" : "Add monthly bill")}<form class="stack" data-f="bill">
+      ${field("Name", inp("name", x.name || "", 'required maxlength="100" placeholder="e.g. Rent, Meralco, Maynilad, PLDT internet"'))}
+      <div class="grid g2">${field("Expense category", sel("category_id", cats.filter((c) => c.is_active || c.id === x.category_id).map((c) => [c.id, c.name]), x.category_id || (cats.find((c) => /rent/i.test(c.name)) || cats[0])?.id))}${field("Amount (optional)", money("amount", x.amount ?? ""), "Leave empty if it changes every month, like electricity.")}</div>
+      <div class="grid g2">${field("Due every month on day", `<input class="in num" type="number" name="due_day" min="1" max="31" value="${x.due_day || 1}" required>`, "29–31 means the last day in shorter months.")}${field("Remind me", suffix("remind_days_before", x.remind_days_before ?? 7, "days before", 'min="0" max="31" required'))}</div>
+      <div class="grid g2">${field("Pay to (optional)", inp("vendor", x.vendor || "", 'maxlength="120" placeholder="e.g. landlord, Meralco"'))}${field("Usually paid via", sel("payment_method_id", [["", "—"], ...methods.filter((m) => m.is_active).map((m) => [m.id, m.name])], x.payment_method_id || ""))}</div>
+      <div class="grid g2">${field("Remind from", `<input class="in" type="date" name="starts_on" value="${x.starts_on || PUB.today}" required>`, "Months before this date are ignored.")}<label class="check" style="align-self:center"><input type="checkbox" name="is_active" ${x.is_active === false ? "" : "checked"}> Active (untick to pause reminders)</label></div>
+      <button class="btn">Save</button></form>`,
+    bind: (m) => wire(m, { bill: async (f, d) => {
+      const row = { name: d.name.trim(), category_id: d.category_id, amount: d.amount === "" ? null : Number(d.amount), due_day: Number(d.due_day), remind_days_before: Number(d.remind_days_before),
+        vendor: d.vendor.trim() || null, payment_method_id: d.payment_method_id || null, starts_on: d.starts_on, is_active: d.is_active === "on" };
+      const ok = await run(() => x.id ? q(sb.from("recurring_bills").update(row).eq("id", x.id).select()) : q(sb.from("recurring_bills").insert(row).select()), "Monthly bill saved.");
+      if (ok) { closeModal(); reload(); } } }) });
   const reload = () => Views.expenses(root, params);
   wire(root, {
     month: (el) => nav(`#/staff/expenses?m=${el.value}`),
+    billnew: () => billForm(),
+    billedit: (el) => billForm(bills.find((x) => x.id === el.dataset.id)),
     add: () => openModal({ render: () => `${mhead("Add expense")}<form class="stack" data-f="x">
       <div class="grid g2">${field("Date", `<input class="in" type="date" name="expense_date" value="${PUB.today}" required>`)}${field("Category", `<select class="in" name="category_id" id="xcat">${usable.map((c) => `<option value="${c.id}" data-type="${c.default_type}">${esc(c.name)}</option>`).join("")}</select>`)}</div>
       ${field("Description", inp("description", "", "required"))}
@@ -1601,19 +1805,20 @@ Views.settings = async (root, params) => {
   if (tab === "openplay") { data.tpl = await q(sb.from("open_play_templates").select("*").order("sort_order")); data.nc = (await q(sb.from("courts").select("id").eq("status", "active"))).length;
     body = `<form class="card pad-lg stack" data-f="openplay"><div class="grid g4">${field("Price per player", money("open_play_price", s.open_play_price))}${field("Session length", suffix("open_play_duration_minutes", s.open_play_duration_minutes, "min", 'min="30" step="30"'))}${field("Players per court", `<input class="in num" type="number" min="1" name="max_players_per_court" value="${s.max_players_per_court}">`)}${field("Max players per booking", `<input class="in num" type="number" min="1" name="max_players_per_booking" value="${s.max_players_per_booking}">`)}</div>
       <h2 style="margin-top:8px">Sessions</h2><p class="muted" style="margin-top:-6px">Repeat on the ticked days. Changes apply to dates that haven't been opened for booking yet; to change courts for one day, use the Open Play page.</p>
-      ${data.tpl.map((t) => `<div class="sub stack" style="gap:8px"><div class="grid g4">${field("Name", inp("name_" + t.id, t.name))}${field("Start", tm("start_" + t.id, t.start_time, "required"))}${field("End", tm("end_" + t.id, t.end_time, "required"))}${field(`Courts (of ${data.nc})`, `<input class="in num" type="number" min="0" max="${data.nc}" name="courts_${t.id}" value="${t.default_courts}">`, `${t.default_courts * s.max_players_per_court} players`)}</div>${isoDays("days_" + t.id, t.days_of_week)}<div class="row"><label class="check"><input type="checkbox" name="active_${t.id}" ${t.is_active ? "checked" : ""}> Active</label><label class="check" style="color:var(--bad)"><input type="checkbox" name="del_${t.id}"> Delete</label></div></div>`).join("")}
-      <details class="sub"><summary style="cursor:pointer;font-weight:700;color:var(--g8)">Add a session</summary><div class="grid g3" style="margin-top:10px">${field("Start", tm("new_start", ""))}${field("End", tm("new_end", ""))}${field("Courts", `<input class="in num" type="number" min="0" name="new_courts" value="${data.nc}">`)}</div></details>${save}</form>`; }
-  if (tab === "booking") body = `<form class="card pad-lg stack" data-f="settings"><h2>Reservation fee</h2><div class="grid g3">${field("Reservation fee", suffix("reservation_fee_pct", s.reservation_fee_pct, "% of total", 'min="0" max="100" step="0.01"'))}${field("Release unpaid bookings after", suffix("payment_expiry_hours", s.payment_expiry_hours, "hours", 'min="0.5" max="168" step="0.5"'))}</div>
+      ${data.tpl.map((t) => `<div class="sub stack" style="gap:8px"><div class="grid g4">${field("Name", inp("name_" + t.id, t.name))}${field("Start", tm("start_" + t.id, t.start_time, "required"))}${field("End", tm("end_" + t.id, t.end_time, "required"))}${field(`Courts (of ${data.nc})`, `<input class="in num" type="number" min="0" max="${data.nc}" name="courts_${t.id}" value="${t.default_courts}">`, `${t.default_courts * s.max_players_per_court} players`)}</div><div class="grid g4">${field("Level", sel("level_" + t.id, LEVELS, t.level || "all_levels"))}</div>${isoDays("days_" + t.id, t.days_of_week)}<div class="row"><label class="check"><input type="checkbox" name="active_${t.id}" ${t.is_active ? "checked" : ""}> Active</label><label class="check" style="color:var(--bad)"><input type="checkbox" name="del_${t.id}"> Delete</label></div></div>`).join("")}
+      <details class="sub"><summary style="cursor:pointer;font-weight:700;color:var(--g8)">Add a session</summary><div class="grid g3" style="margin-top:10px">${field("Start", tm("new_start", ""))}${field("End", tm("new_end", ""))}${field("Courts", `<input class="in num" type="number" min="0" name="new_courts" value="${data.nc}">`)}${field("Level", sel("new_level", LEVELS, "all_levels"))}</div></details>${save}</form>`; }
+  if (tab === "booking") body = `<form class="card pad-lg stack" data-f="settings"><h2>Payment to reserve</h2><div class="grid g3">${field("Customers pay online to reserve", suffix("reservation_fee_pct", s.reservation_fee_pct, "% of total", 'min="0" max="100" step="0.01"'), "100% = full payment before the slot is reserved.")}${field("Release unpaid bookings after", suffix("payment_expiry_hours", s.payment_expiry_hours, "hours", 'min="0.5" max="168" step="0.5"'))}</div>
+    <label class="check"><input type="checkbox" name="addons_enabled" ${s.addons_enabled !== false ? "checked" : ""}> Let customers add paddle and ball rentals when they book online (optional add-ons)</label>
     <label class="check"><input type="checkbox" name="auto_complete_checked_in" ${s.auto_complete_checked_in ? "checked" : ""}> Mark checked-in bookings completed automatically when their time ends</label>
     <h2 style="margin-top:8px">Cancellation & refunds</h2><div class="grid g3">${field("Refundable if cancelled at least", suffix("refund_cutoff_hours", s.refund_cutoff_hours, "hours", 'min="0"'), "72 hours = 3 days")}${field("No refund if cancelled within", suffix("forfeit_cutoff_hours", s.forfeit_cutoff_hours, "hours", 'min="0"'))}${field("Refund amount", suffix("refund_pct", s.refund_pct, "% of paid", 'min="0" max="100"'))}</div>
     ${field("In between those windows", sel("middle_window_policy", [["admin_decides", "Manager decides case by case"], ["refund", "Refund"], ["forfeit", "No refund"]], s.middle_window_policy))}
     <label class="check"><input type="checkbox" name="allow_refund_override" ${s.allow_refund_override ? "checked" : ""}> Allow managers to override the suggested refund (reason is always recorded)</label>
     ${field("Cancellation policy (shown to customers)", `<textarea class="in" name="cancellation_policy_text">${esc(s.cancellation_policy_text || "")}</textarea>`)}${save}</form>`;
   if (tab === "payments") { data.pm = await q(sb.from("payment_methods").select("*").order("sort_order"));
-    body = `<form class="card pad-lg stack" data-f="payments"><p class="muted">Methods marked <b>Online</b> are shown to customers paying the reservation fee. <b>Counter</b> methods appear in the POS.</p>
+    body = `<form class="card pad-lg stack" data-f="payments"><p class="muted">Methods marked <b>Online</b> are shown to customers paying for their booking. <b>Counter</b> methods appear in the POS.</p>
       ${data.pm.map((m) => `<div class="sub stack" style="gap:8px"><div class="grid g4">${field("Name", inp("name_" + m.id, m.name, "required"))}${field("Type", sel("kind_" + m.id, [["cash", "Cash"], ["gcash", "GCash"], ["bank", "Bank"], ["ewallet", "E-wallet"], ["card", "Card"], ["other", "Other"]], m.kind))}${field("Account name", inp("acct_" + m.id, m.account_name || ""))}${field("Account / mobile no.", inp("num_" + m.id, m.account_number || ""))}</div>
         <div class="grid g2">${field("Bank (for bank transfer)", inp("bank_" + m.id, m.bank_name || ""))}${field("Extra instructions", inp("ins_" + m.id, m.instructions || ""))}</div>
-        <div class="row"><label class="check"><input type="checkbox" name="online_${m.id}" ${m.use_for_online ? "checked" : ""}> Online (reservation fee)</label><label class="check"><input type="checkbox" name="pos_${m.id}" ${m.use_for_pos ? "checked" : ""}> Counter / POS</label><label class="check"><input type="checkbox" name="active_${m.id}" ${m.is_active ? "checked" : ""}> Active</label></div></div>`).join("")}
+        <div class="row"><label class="check"><input type="checkbox" name="online_${m.id}" ${m.use_for_online ? "checked" : ""}> Online (bookings)</label><label class="check"><input type="checkbox" name="pos_${m.id}" ${m.use_for_pos ? "checked" : ""}> Counter / POS</label><label class="check"><input type="checkbox" name="active_${m.id}" ${m.is_active ? "checked" : ""}> Active</label></div></div>`).join("")}
       <div class="grid g2">${field("Add a method", inp("new_name", "", 'placeholder="e.g. Maya"'))}${field("Type", sel("new_kind", [["ewallet", "E-wallet"], ["gcash", "GCash"], ["bank", "Bank"], ["card", "Card"], ["other", "Other"]], "ewallet"))}</div>
       ${field("Payment instructions for customers", `<textarea class="in" name="payment_instructions">${esc(s.payment_instructions || "")}</textarea>`)}${save}</form>`; }
   if (tab === "pos") { data.cats = await q(sb.from("product_categories").select("*").order("sort_order")); data.eq = await q(sb.from("equipment").select("*").order("name"));
@@ -1699,9 +1904,9 @@ Views.settings = async (root, params) => {
         await q(sb.from("business_settings").update({ open_play_price: Number(g("open_play_price")), open_play_duration_minutes: Number(g("open_play_duration_minutes")), max_players_per_court: Number(g("max_players_per_court")), max_players_per_booking: Number(g("max_players_per_booking")) }).eq("id", 1).select());
         for (const t of data.tpl) {
           if (g("del_" + t.id) === "on") { await q(sb.from("open_play_templates").delete().eq("id", t.id).select()); continue; }
-          await q(sb.from("open_play_templates").update({ name: g("name_" + t.id) || "Open Play", start_time: g("start_" + t.id), end_time: g("end_" + t.id), default_courts: Number(g("courts_" + t.id)), days_of_week: fd.getAll("days_" + t.id).map(Number), is_active: g("active_" + t.id) === "on" }).eq("id", t.id).select());
+          await q(sb.from("open_play_templates").update({ name: g("name_" + t.id) || "Open Play", start_time: g("start_" + t.id), end_time: g("end_" + t.id), default_courts: Number(g("courts_" + t.id)), level: g("level_" + t.id) || "all_levels", days_of_week: fd.getAll("days_" + t.id).map(Number), is_active: g("active_" + t.id) === "on" }).eq("id", t.id).select());
         }
-        if (g("new_start") && g("new_end")) await q(sb.from("open_play_templates").insert({ name: "Open Play", start_time: g("new_start"), end_time: g("new_end"), default_courts: Number(g("new_courts")) || 1, sort_order: data.tpl.length + 1 }).select());
+        if (g("new_start") && g("new_end")) await q(sb.from("open_play_templates").insert({ name: "Open Play", start_time: g("new_start"), end_time: g("new_end"), default_courts: Number(g("new_courts")) || 1, level: g("new_level") || "all_levels", sort_order: data.tpl.length + 1 }).select());
       }, "Open Play saved.");
       if (ok) reload();
     },
@@ -1750,8 +1955,8 @@ const genSessions = (open, close, dur, courts) => { const s = toMin(open); let e
 const Setup = {
   step: 0,
   d: { name: "The Paddle Arch", address: "", phone: "", email: "", open: "10:00", close: "02:00", courts: 3, names: ["Court 1", "Court 2", "Court 3"],
-    opPrice: 150, opDur: 240, perCourt: 12, sessions: genSessions("10:00", "02:00", 240, 1), dayRate: 350, eveRate: 450, eveStart: "17:00", fee: 50, expiry: 8,
-    gcashName: "", gcashNum: "", bank: "", bankName: "", bankNum: "", instructions: "Send the reservation fee to one of the accounts below, then upload a screenshot of your receipt. Your booking is reserved once we verify the payment.",
+    opPrice: 150, opDur: 240, perCourt: 12, sessions: genSessions("10:00", "02:00", 240, 1), dayRate: 350, eveRate: 450, eveStart: "17:00", fee: 100, expiry: 8,
+    gcashName: "", gcashNum: "", bank: "", bankName: "", bankNum: "", instructions: "Send the full amount to one of the accounts below, then upload a screenshot of your receipt. Your booking is reserved once we verify the payment.",
     paddle: 100, paddleQty: 20, ball: 30, ballQty: 30, refundH: 72, forfeitH: 24, refundPct: 100, middle: "admin_decides",
     policy: "Cancel 3 or more days before your booking for a refund of your reservation fee. Cancellations less than 24 hours before are not refundable. Between 24 and 72 hours, refunds are at management's discretion.",
     investors: [], demo: true },
@@ -1768,7 +1973,7 @@ const Setup = {
       <button type="button" class="btn sec sm" data-a="add">${ic("plus")} Add session</button><p class="muted" style="font-size:13px">Courts not used by Open Play stay available to rent.</p>`;
     if (st === 2) body = `<div class="grid g3">${field("Daytime rate / court-hour", money("dayRate", d.dayRate))}${field("Evening rate starts", tm("eveStart", d.eveStart))}${field("Evening rate / court-hour", money("eveRate", d.eveRate))}</div>
       ${notice(`${clock(d.open)} – ${clock(d.eveStart)}: ${peso(d.dayRate)}/hr · ${clock(d.eveStart)} – ${clock(d.close)}: ${peso(d.eveRate)}/hr. A booking that crosses ${clock(d.eveStart)} is charged each rate for its own hours.`)}
-      <div class="grid g2">${field("Reservation fee", suffix("fee", d.fee, "% of total", 'min="0" max="100"'), "Paid online to hold the slot.")}${field("Release unpaid bookings after", suffix("expiry", d.expiry, "hours", 'min="1" max="168"'))}</div>`;
+      <div class="grid g2">${field("Pay online to reserve", suffix("fee", d.fee, "% of total", 'min="0" max="100"'), "100% = full payment before the slot is reserved.")}${field("Release unpaid bookings after", suffix("expiry", d.expiry, "hours", 'min="1" max="168"'))}</div>`;
     if (st === 3) body = `<h3>GCash</h3><div class="grid g2">${field("Account name", inp("gcashName", d.gcashName))}${field("GCash number", inp("gcashNum", d.gcashNum, 'inputmode="tel"'))}</div>
       <h3>Bank transfer</h3><div class="grid g3">${field("Bank", inp("bank", d.bank, 'placeholder="BPI, BDO…"'))}${field("Account name", inp("bankName", d.bankName))}${field("Account number", inp("bankNum", d.bankNum))}</div>
       ${field("Payment instructions for customers", `<textarea class="in" name="instructions">${esc(d.instructions)}</textarea>`)}<p class="muted" style="font-size:13px">Cash is always available at the counter. Add Maya or others later in Settings.</p>`;
@@ -1820,7 +2025,7 @@ const Setup = {
     if (Setup.step === 0 && !d.name) return "Enter the business name.";
     if (Setup.step === 1 && d.sessions.some((x) => x.courts > d.courts)) return `A session can use at most ${d.courts} courts.`;
     if (Setup.step === 2 && !(d.fee >= 0 && d.fee <= 100)) return "Reservation fee must be between 0% and 100%.";
-    if (Setup.step === 3 && !(d.gcashNum || d.bankNum)) return "Enter at least a GCash number or a bank account so customers can pay the reservation fee.";
+    if (Setup.step === 3 && !(d.gcashNum || d.bankNum)) return "Enter at least a GCash number or a bank account so customers can pay for their bookings.";
     if (Setup.step === 4 && d.forfeitH > d.refundH) return "The no-refund window must be shorter than the refund window.";
     if (Setup.step === 5) { if (sum(d.investors, (x) => x.pct) > 100) return "Investor ownership can't add up to more than 100%."; if (d.investors.some((x) => !x.name || !(x.pct > 0))) return "Each investor needs a name and a percentage (or remove the row)."; }
     return "";
