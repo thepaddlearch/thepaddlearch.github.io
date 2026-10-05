@@ -286,6 +286,12 @@ button.blk{display:flex;flex-direction:column;justify-content:flex-start;align-i
 .addon:last-child{border-bottom:0}
 .yn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .yn .choice{padding:12px 14px;text-align:center}
+#pa-alert{position:fixed;right:16px;bottom:16px;z-index:60;width:min(380px,calc(100vw - 32px));background:var(--paper);border:1.5px solid var(--g7);border-radius:16px;box-shadow:var(--lift);padding:14px 16px;animation:paIn .25s ease-out}
+#pa-alert h3{margin:0;font-size:16px;display:flex;align-items:center;gap:8px}
+#pa-alert .it{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
+@keyframes paIn{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.alert-toggle{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;font-size:13px;font-weight:700;color:var(--ink-2);border:1px solid var(--line)}
+.alert-toggle[aria-pressed="true"]{background:var(--g0);color:var(--g8);border-color:var(--g2)}
 </style>
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABlCAMAAACx8telAAAAwFBMVEWdr6NnmW1SfGNijGrd3dt3noquxbM3dTpKdVwdakETfHxajmYA//8APQO508WMpJE4bUpJhFLL0rV7pI7//wA8b1EzmWZYcGJAck5//3+Cm3x/fwC7u8nGuLgAAAAWZjctcjr9/v4oaUMlaTwwa0lVVVV/f381dENHeFkAVQCLp5RXhWg4c0pFdlQ5clBDeE1ah2sAVVVulHlLeVtoinMAPT0A/wA3bU0AfwA7dVJNg1fR189VhWQ/Pz9Rglp3mYWUILmtAAAAQHRSTlMiImBrEjEeBJb/Ap4BBCFFhMYRRwF6BSHSAi4CExIA/vcF8/3TAwLykAMsb9Ctss5UA0xxUAQBsAKVsBOKBI9JrK71eQAACipJREFUeNqtWudi6jgTtTE1pGxu2fIVBckV3AiYFCDh/d9qR3LRCEsOJbr3R0IsjqefGcki56z5hx+Q71kW+WHbQ2rx1ad81X+hdCc+tYZ99Clf3wJuUcsZM7Fc5qGVeF71KROfZ1n2mkW9YiHe4fn2eolBtuUrezpxwdulPb7pmV4PDOuQuk8nL8ZeewAbXC8x/wqHPZ2xJl78PRL7hMSTc5Cf3Ay20quBCb0jWducWfb+HsF6h5V5TH015lyDXAODxSxV2SxeqF9LF3GmPMLG3yAxR97jb/Xuy5Qh1t18Xj3e8zD2+HuAh/g7V2QUvKgSB3MRewiaxeT5auBbQj2kRqq1XwA4NEbIB3JzLTBRgDOT+agNm/5uop7dXxjPGJgkEjgic+Mem9AUveHN9cCvMpQisiFdyM07uiueBL4NmK3Jh3kTtVDsef03ei2wTCFurwuYZ7q4MXOvwyqXAHcq8AUpmw0v8S8EPDcCvwT+s+8HAeIDAXlg0hGfvxNYftmblntIz2bWBcGsAL/LcMLAkKULx1kNRBKtCYBPVu4psXcmMFJ1QFZ5GM5mszBMnQV/TkBTlG9A5ODbgQOgCO6sXmG6Atg5T+LPZN1++ta/EpjVX+WTRTjDK8xjS9CegCwa98qwv58N/Ewinaqj2fEKgfb4FOd2KCkvQv12carSFYklMLNLYKAH4ay90gUZkb/IuHl8IfDg1RkN6FXAi/rNPzW4MzcE2vOnNDJb8vcUhTU+MXWbgEs/peRHPtMuFtERcVTgOc+jHiW3ZwOvscRUfOTMTAtkXroYuAow57Q8ZgIelgSE5iZcNx+SQgEelb979CTuaQLeEdErDEKjxGEhJXZtbpnSy6FA35wbTusjyjXXu1YFvCbrRuIBCQJSlHHtUXI5sNAX/Es6gB2ZcFgfJKYVj2AncZIuYJuszJqezQrJWOBxnxxq+V/puRL3npAItFvTs5lNmsyV8v2yTA5OsLKF6UzPxc710uHTsJIf/2ty9RpceiDZdnqexL70Up5AKFRc1gGcSihIsBvc88m8dz4wbO3WNPhWD5kYlSrBDN7OAi4wsN+t6dCSGZarNlL6yK+ZgRn4z26fjihtlLskxz3u+BwbB8R2kWOONJUYCbwilMkQUAWWKfd8YJvHRwdwTsH1qoffWwI/Pe0vlbggZNeRtmaxFBIMKimBkgguAAbqo+ceNREYvjSaho52V/08Zahl908HHkhg8JeiA/gTivGkcYd6YsRopCbdU4EXisRRZyw1TC8iL32vTmAomotukREwRS7CgTt8C1xnyZrkWneOrP9GFJEvBN53Cpw0Q5BG+BhCELn3slNkE/CaEMc14YJLx40P3ZBCkgdMGBN6icQRhFNuYlt9cl8+yfZQTCuB3RjqKB7TsU4rG4DBZe5MIoeHuvYCLmcLTHHj6OvJUQu4j4E30AFrkfe0YlegZ9k0umXggsguGoLZFwDPfX0KAUX/5M8xbyAqS8V4PFrOYLBjpx0U2wT8Kt5eU5CBTnNcxgfWYsRYEi+3AJfm6wbFsttRHRVgegzcb4mcW1bEJixd7kSv6hP7mNP6knx1EQIV2FOA2y1buN2Rw3h96MuZRFqP2QKZABkiBNYlwAE5KCLnq+YkwqelXqtAUGP2FJERsDK+TaoAC9EogE8h4L/v+7SZB6VtDq+IbJyBWcrQzMOZ9oV3qU1NTvjpx1FCGNQQqsBobjUZmxy7A5iLN6wlTq1avWjdVKFzNEjFZa7s/r4ETlRgoAZh0wzPW2OVZqaf0WNLSiuvDXnTBAxveitGPm5VBjWmeiPjSUUF/KMRKxruUnIuMAXf2k63IPMnnWu2//OrEjilbddN9TNCw/QWA4seBvryfLqN9CwGeq2J7MqP/jT4SmQ1vqVzgfoAeA1F0M0trZkaiqdv0ZoWdrLUlgoTsDvgYkzFDFPfgvlV76RtV3xEHPWEQAXOMDCk+8fH6XTvaDc2eS7VJyfZ4EwOOo0ZgaHzpCJTu6npcKCrP8NTZS0hsIhhUv4XIf3cLZsGzQs3+XVcncL5z5uPzebDD4JqvkYbK2uHIkZgoJmL6Xb7mOTadOtXhJ7XH/94TD4Sw91D49gpPUPVS06Xk+Rx6xiOgJKGIokDoaK35mtpl2ew8wCJ7P6n/e4miYEV07RqhLUmLAk99NGE2s6rx1xX2NTlp87OAPZsqLTy+1fArwpwXjXCvtlpx8Tae0xzg4FfYEDz7HZEGoF7ZPW43W6TVJe2ap9lD5HpagF7XyjHJSdLvOa9U5JPH/QWLnNx2HWjgUUyltuEwAxcjhO17cA/eKglcgRjWSouE3BrSxozbX7+PE4zKjA6eIpo6Lpi5KCrhymWzIuWi7488FxFDTjDhCAwAt9h4LE1nU63uS57YFL1xLKi33piMW7ZIO6wsQI8zYHebadUc56DWkJxGwQyxh3kOXtp26Cfkc3r73B9BH08IcDAG/KHfLCilprQRwInP7mLv/DBXpSHnInuF5xR8D1WqiI7qu6MwFW/1msXU9kdZeWNH5BlH9ZTmbDMdAEktJgdifxyFbDsByHErbJAbnG3sS+ZELxRwdSLMvNTgJOtUN2PVvpoLAwFnqfGXyVuWLbxoRiv1uNqZbKqiqwCI+fKiL3+dCyNS1c9pVcFyH/LIyJHVO/U+kSUZYQq1DH7VoF/P305wXiuCcDP0gi0bCnDoRjWOOQefovkN8au4W6JUdUeDUbz+a2G8Qgh3H3VD/vVmVgialnibME5ZE1Q5+dYZFWXiTJyph2MBwz2q6bQunOS5vS5j6/TmLpFPIPVH+LUFK+541MeXORC23lS+ZcrY9bHZsbV0WpbrylPz2aBmyYQIioBrmDNeL/Bz7jDPWjgU+718Sh7LEuFhUcgnhLwfd3pdyXwoH51ccAcExpyx+IFbc+dDV3YCfBkBexnt4B9VWAe8H5b4PL0IMP9RFJKCR00j+eUHhi8wwjFPbqglkJBaF2du2+n9WOnnldsJm6SELcx+LFbJQ8+rwjdsED5Tqll8iqPpbshYLrhNCLFpLrehuz/OZOo1fTg/ygifmFdc/+yFWBbSTIV8kFFHpFh2BrMBuLaRBgvOP62TNrqyIUqvuPdl3utGlf1rMYXPnDgDZOGu6G7T3QKwH3yIOgKR/4bdzV0dGRDcQBaAUMNGyZavraoJx/8mwoPcbcNlbNXsPLnA6Ss3OqDX6OZF7cgat+qZNznHlJL7BmY4rK5ZGu/orSLmxKIqBwKsTAu/yFWFR23vjrZibto/A7Ru/vFJdvdw5jVzQL/dMJ6i52CjIdw6KpbzC9Kl9tcJM7O4oT/YeyZF2NpAbnF7tkDuyiWy2Ucr9e/f/8xLigaO1EnD/lK9kNFXqvXW4o9vTX0VuVl2ix7HYtRI7X4xE5Z6Ndd37a+PAF/E1evluLW95fnqLrqZF6BX68PWCNohRUSSFF4Kdtubuo9Hx+bu7u7zd1mTubgcv8CCOrFp3zm8rQAAAAASUVORK5CYII=">
 </head><body>
@@ -917,6 +923,7 @@ const Staff = {
     const page = r.parts[1] || "dashboard";
     const def = Staff.pages.find((p) => p.key === page);
     Staff.shell(page);
+    Alerts.start();
     const main = $("#main .wrap");
     main.innerHTML = `<p class="muted">Loading…</p>`;
     if (page === "new") return Flow.start(r.parts[2] === "open-play" ? "open_play" : r.parts[2] === "court" ? "court_rental" : null, "staff", main);
@@ -936,6 +943,7 @@ const Staff = {
           <a class="brand" href="#/staff" style="text-decoration:none;color:inherit"><img src="${MONO}" alt=""><div><b>${esc(PUB.business_name)}</b></div></a>
           <div class="court-rule"></div>
           <div style="padding:0 12px 8px"><a class="btn block" href="#/staff/new">${ic("plus")} New booking</a></div>
+          <div id="alert-toggle" style="padding:0 12px 8px"></div>
           <ul class="nav">${nav}</ul>
           <div class="who"><div style="width:34px;height:34px;border-radius:50%;background:var(--g1);color:var(--g8);display:grid;place-items:center;font-weight:800">${esc((Staff.acct.full_name || "?")[0].toUpperCase())}</div>
             <div style="flex:1;min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(Staff.acct.full_name)}</b><span class="muted">${role}</span></div>
@@ -948,7 +956,7 @@ const Staff = {
     scrim.addEventListener("click", () => toggle(false));
     wire(APP.querySelector(".who"), { out: Staff.signOut });
   },
-  async signOut() { await sb.auth.signOut(); Staff.acct = null; nav("#/staff"); },
+  async signOut() { Alerts.stop(); await sb.auth.signOut(); Staff.acct = null; nav("#/staff"); },
 
   login(mode) {
     const signup = mode === "signup";
@@ -1173,6 +1181,100 @@ const Staff = {
       }, "Message sent on Messenger.")),
       extend: async (f, d) => again(await run(() => rpc("extend_booking_expiry", { p_booking_id: b.id, p_hours: Number(d.hours) }), "Deadline extended.")),
     });
+  },
+};
+
+// ---------------------------------------------------------------- payment alerts (pop-up + sound + notification)
+// Checks every 20 seconds while any staff page is open (even in a background tab) and alerts
+// managers when a new payment needs checking: customer payment proofs and GCash/bank POS sales.
+const Alerts = {
+  timer: null, seen: null, ctx: null, baseTitle: document.title, busy: false,
+  can() { return Staff.can("bookings.verify_payment"); },
+  on() { try { return localStorage.getItem("pa.alerts") !== "off"; } catch (_) { return true; } },
+  set(v) { try { localStorage.setItem("pa.alerts", v ? "on" : "off"); } catch (_) {} },
+  key: (x) => `${x.kind}:${x.id}:${x.status}`,
+  loadSeen() { try { const v = JSON.parse(localStorage.getItem("pa.alerts.seen") || "null"); return Array.isArray(v) ? v : null; } catch (_) { return null; } },
+  saveSeen(keys) { try { localStorage.setItem("pa.alerts.seen", JSON.stringify(keys.slice(-300))); } catch (_) {} },
+  start() {
+    if (!Alerts.can()) return;
+    Alerts.renderToggle();
+    if (Alerts.timer) return;
+    document.addEventListener("click", Alerts.unlock, { once: true });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && Alerts.timer) Alerts.check(); });
+    Alerts.check(true);
+    Alerts.timer = setInterval(() => Alerts.check(), 20000);
+  },
+  stop() { clearInterval(Alerts.timer); Alerts.timer = null; Alerts.seen = null; document.title = Alerts.baseTitle; $("#pa-alert")?.remove(); },
+  renderToggle() {
+    const box = $("#alert-toggle"); if (!box) return;
+    const on = Alerts.on();
+    box.innerHTML = `<button type="button" class="alert-toggle" aria-pressed="${on}" title="Pop-up and sound when a payment needs checking">${on ? "🔔 Payment alerts on" : "🔕 Payment alerts off"}</button>`;
+    box.firstChild.addEventListener("click", async () => {
+      const next = !Alerts.on(); Alerts.set(next); Alerts.unlock();
+      if (next) {
+        if ("Notification" in window && Notification.permission === "default") { try { await Notification.requestPermission(); } catch (_) {} }
+        Alerts.chime(); toast("Payment alerts on — you'll hear a sound when a payment needs checking.");
+      } else toast("Payment alerts off on this device.");
+      Alerts.renderToggle();
+    });
+  },
+  unlock() { try { Alerts.ctx = Alerts.ctx || new (window.AudioContext || window.webkitAudioContext)(); if (Alerts.ctx.state === "suspended") Alerts.ctx.resume(); } catch (_) {} },
+  chime() {
+    try {
+      const C = Alerts.ctx || (Alerts.ctx = new (window.AudioContext || window.webkitAudioContext)());
+      if (C.state === "suspended") C.resume();
+      const t = C.currentTime + 0.05;
+      [[880, 0], [1175, 0.18], [1568, 0.36], [1175, 0.9], [1568, 1.08]].forEach(([f, d]) => {
+        const o = C.createOscillator(), g = C.createGain(); o.type = "sine"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t + d); g.gain.exponentialRampToValueAtTime(0.4, t + d + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.4);
+        o.connect(g); g.connect(C.destination); o.start(t + d); o.stop(t + d + 0.45);
+      });
+    } catch (_) {}
+  },
+  async check(first = false) {
+    if (!Staff.acct || Alerts.busy) return;
+    Alerts.busy = true;
+    let queue;
+    try { queue = await rpc("staff_payment_queue"); } catch (_) { Alerts.busy = false; return; }
+    Alerts.busy = false;
+    const keys = queue.map(Alerts.key);
+    if (!Alerts.seen) { const stored = Alerts.loadSeen(); Alerts.seen = new Set(stored || keys); }
+    const fresh = queue.filter((x) => x.status !== "problem" && !Alerts.seen.has(Alerts.key(x)));
+    keys.forEach((k) => Alerts.seen.add(k));
+    Alerts.saveSeen([...Alerts.seen].filter((k) => keys.includes(k)));
+    const open = queue.filter((x) => x.status !== "problem").length;
+    document.title = open ? `(${open}) Payment${open === 1 ? "" : "s"} to check · ${Alerts.baseTitle}` : Alerts.baseTitle;
+    if (!Alerts.on()) return;
+    if (fresh.length) { Alerts.popup(fresh, open, false); Alerts.chime(); Alerts.notify(fresh); }
+    else if (first && open) Alerts.popup(queue.filter((x) => x.status !== "problem"), open, true);
+    else if (!open) $("#pa-alert")?.remove();
+  },
+  label(x) { return `${x.kind === "pos" ? "POS sale" : x.type === "open_play" ? "Open Play" : "Court rental"} · ${x.customer || "Walk-in"}`; },
+  popup(items, open, quiet) {
+    $("#pa-alert")?.remove();
+    const el = document.createElement("div"); el.id = "pa-alert"; el.setAttribute("role", "alert");
+    const list = items.slice(0, 3);
+    el.innerHTML = `<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><h3>${quiet ? "💳 Payments waiting" : `💳 New payment${items.length > 1 ? "s" : ""} to check`}</h3><button type="button" class="btn ghost sm" data-x aria-label="Close">${ic("close")}</button></div>
+      ${list.map((x, i) => `<div class="it"><div style="min-width:0"><b class="num">${peso(x.amount)}</b> <span class="muted">${esc(x.method || "")}</span><div class="muted" style="font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.reference)} · ${esc(Alerts.label(x))}</div></div><button type="button" class="btn sm" data-i="${i}">Check</button></div>`).join("")}
+      ${open > list.length ? `<div class="it"><span class="muted">${open} waiting in total</span><button type="button" class="btn sec sm" data-all>See all</button></div>` : ""}`;
+    document.body.appendChild(el);
+    el.querySelector("[data-x]").onclick = () => el.remove();
+    el.querySelector("[data-all]")?.addEventListener("click", () => { el.remove(); nav("#/staff/dashboard"); });
+    el.querySelectorAll("[data-i]").forEach((b) => b.addEventListener("click", () => { el.remove(); Alerts.open(list[Number(b.dataset.i)]); }));
+  },
+  open(x) {
+    if (!x) return;
+    if (x.kind === "pos") { nav("#/staff/dashboard"); setTimeout(() => openPosCheck(x, () => Staff.refreshPage?.()), 400); }
+    else Staff.openBooking(x.booking_id);
+  },
+  notify(items) {
+    try {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      const x = items[0];
+      const n = new Notification(items.length > 1 ? `${items.length} new payments to check` : "New payment to check", {
+        body: `${peso(x.amount)} ${x.method || ""} · ${x.reference} · ${Alerts.label(x)}`, tag: "pa-payment", renotify: true, icon: MONO });
+      n.onclick = () => { window.focus(); n.close(); Alerts.open(x); };
+    } catch (_) {}
   },
 };
 
