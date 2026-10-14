@@ -531,6 +531,9 @@ const MINE_KEY = "paddlearch.mybookings";
 const myBookings = () => { try { return JSON.parse(localStorage.getItem(MINE_KEY) || "[]"); } catch { return []; } };
 const rememberBooking = (ref, token) => { try { const l = myBookings().filter((x) => x.ref !== ref); l.unshift({ ref, token, at: Date.now() }); localStorage.setItem(MINE_KEY, JSON.stringify(l.slice(0, 20))); } catch {} };
 const bookingLink = (ref, t) => `#/booking/${encodeURIComponent(ref)}?t=${t}`;
+// Open Play times customers should see: courts assigned (set by the admin), not over yet,
+// and either bookable or sold out. Times with no courts / no schedule are hidden.
+const opVisible = (x, staff) => x.status === "open" && Number(x.capacity) > 0 && new Date(x.ends_at) > Date.now() && (staff || x.is_bookable || Number(x.remaining) === 0);
 const messengerLink = (page, token) => `https://m.me/${encodeURIComponent(page)}?ref=${encodeURIComponent(token)}`;
 
 function siteShell(inner) {
@@ -576,7 +579,7 @@ const Site = {
 
   async home() {
     let sessions = [];
-    try { sessions = await rpc("get_open_play_sessions", { p_date: PUB.today }); } catch {}
+    try { sessions = (await rpc("get_open_play_sessions", { p_date: PUB.today })).filter((x) => opVisible(x, false)); } catch {}
     APP.innerHTML = siteShell(`
       <section class="hero">
         <div><p class="eyebrow">Pickleball · ${(PUB.courts_count || 3)} courts</p>
@@ -747,7 +750,7 @@ const Flow = {
   },
   async stepOpenPlay() {
     const S = Flow.S;
-    const sessions = await rpc("get_open_play_sessions", { p_date: S.date });
+    const sessions = (await rpc("get_open_play_sessions", { p_date: S.date })).filter((x) => opVisible(x, S.mode === "staff"));
     Flow.sessions = sessions;
     const sessOk = (x) => x.status === "open" && x.capacity > 0 && x.remaining > 0 && (S.mode === "staff" ? new Date(x.ends_at) > Date.now() : x.is_bookable);
     if (S.session && !sessions.some((x) => x.id === S.session && sessOk(x))) S.session = null;
@@ -759,7 +762,7 @@ const Flow = {
       <div class="stack" style="gap:10px">${sessions.length ? sessions.map((x) => { const ok = sessOk(x); return `<button type="button" class="choice ${ok ? "" : "dis"}" ${ok ? `data-a="session" data-id="${x.id}"` : "disabled"} aria-pressed="${S.session === x.id}">
         <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="row" style="gap:8px"><b style="font-size:17px">${fmtRange(x.starts_at, x.ends_at)}</b>${levelTag(x.level)}</div><div class="muted"><b class="num" style="color:var(--ink)">${x.booked} / ${x.capacity}</b> booked</div></div>
         ${x.remaining === 0 ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : !ok ? `<span class="tag">Closed</span>` : `<b style="color:var(--g7)">${x.remaining} slot${x.remaining === 1 ? "" : "s"} left</b>`}</div>
-        <div class="bar" style="margin-top:10px"><i style="width:${x.capacity ? Math.min(100, (x.booked / x.capacity) * 100) : 100}%"></i></div></button>`; }).join("") : `<p class="empty">No Open Play sessions on this day.</p>`}</div>
+        <div class="bar" style="margin-top:10px"><i style="width:${x.capacity ? Math.min(100, (x.booked / x.capacity) * 100) : 100}%"></i></div></button>`; }).join("") : `<p class="empty">No Open Play scheduled ${S.date === PUB.today ? "for the rest of today" : "on this day"}. Please pick another day${S.mode === "staff" ? "" : ", or rent a court instead"}.</p>`}</div>
       ${cur ? `<div class="row" style="margin-top:18px;justify-content:space-between"><div><p class="label">Number of players</p><div class="qty"><button type="button" data-a="players" data-d="-1" aria-label="Fewer players">−</button><span class="num">${S.players}</span><button type="button" data-a="players" data-d="1" aria-label="More players">+</button></div></div>
         <div style="text-align:right"><p class="muted">${S.players} × ${peso(cur.price_per_player)}</p><p style="font-family:var(--display);font-size:26px">${peso(S.players * cur.price_per_player)}</p></div></div>` : ""}
       <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn" data-a="next" ${cur ? "" : "disabled"}>Continue ${ic("arrow")}</button></div>`;
@@ -1834,9 +1837,16 @@ Views.reports = async (root, params) => {
       </tbody></table><p class="muted" style="font-size:13px;margin-top:12px">Stock purchases are paid in cash (see Payment summary and Purchases) but only reach profit as they're used up. Your accountant will want the end value for the balance sheet.</p></div>`;
     exportRows = [["Line", "Amount"], ...Object.entries(d.revenue).map(([k, v]) => [`Revenue: ${BUCKET_LABEL[k] || k}`, v]), ["Total revenue", d.total_revenue], ["Cost of goods sold", d.cogs], ["Stock written off", d.stock_written_off || 0], ["Gross profit", d.gross_profit], ...d.operating_expenses.map((x) => [`Expense: ${x.category}`, x.amount]), ["Total operating expenses", d.total_operating_expenses], ["Net profit", d.net_profit], ...d.capital_expenses.map((x) => [`Capital: ${x.category}`, x.amount]), ["Net after capital expenses", d.net_after_capex], [], ["Stock value at start", st.opening_value], ["Stock purchased", st.purchases], ["Stock added by adjustment", st.added_by_adjustment], ["Sold (cost)", -st.cost_of_sold], ["Written off", -st.written_off], ["Rounding", st.rounding], ["Stock value at end", st.closing_value]];
   } else {
-    const [rows, methods] = await Promise.all([rpc("report_collections", { p_from: from, p_to: to }), loadMethods()]);
+    const [rows, methods, acc] = await Promise.all([rpc("report_collections", { p_from: from, p_to: to }), loadMethods(), fin ? rpc("report_accounts", { p_to: to }).catch(() => null) : null]);
     const dates = [...new Set(rows.map((r) => r.business_date))].sort().reverse();
-    body = `<div class="stack">${dates.map((date) => { const rs = rows.filter((r) => r.business_date === date); return `<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${fmtDate(date, { weekday: "long", month: "long", day: "numeric" })}</h2><b class="num" style="font-family:var(--display);font-size:22px">${peso(sum(rs, (r) => r.amount))}</b></div>
+    const accCard = !fin || !acc ? "" : !acc.set
+      ? `<div class="card row" style="justify-content:space-between;gap:10px;margin-bottom:14px"><span style="font-size:14px">Add your opening balance to see how much money is in each account.</span>${Staff.can("settings.manage") ? `<a class="btn sec sm" href="#/staff/settings?tab=opening">Add opening balance</a>` : ""}</div>`
+      : `<div class="card" style="margin-bottom:14px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Money in each account</h2><span class="muted" style="font-size:13px">as of ${fmtDate(acc.as_of, { month: "short", day: "numeric", year: "numeric" })}</span></div>
+        <table class="t" style="margin-top:8px"><thead><tr><th>Account</th><th class="r">Opening (${fmtDate(acc.starts_on, { month: "short", day: "numeric" })})</th><th class="r">Money in</th><th class="r">Money out</th><th class="r">Balance</th></tr></thead><tbody>
+        ${acc.accounts.map((a) => `<tr><td>${esc(a.name)}</td><td class="r num">${peso(a.opening)}</td><td class="r num">${peso(a.money_in)}</td><td class="r num">${peso(-a.money_out)}</td><td class="r num"><b>${peso(a.balance)}</b></td></tr>`).join("")}
+        <tr><td><b>Total</b></td><td class="r num">${peso(sum(acc.accounts, (a) => a.opening))}</td><td class="r num">${peso(sum(acc.accounts, (a) => a.money_in))}</td><td class="r num">${peso(-sum(acc.accounts, (a) => a.money_out))}</td><td class="r num"><b>${peso(sum(acc.accounts, (a) => a.balance))}</b></td></tr></tbody></table>
+        <p class="muted" style="font-size:13px;margin-top:8px">Money in = payments and POS sales received (minus refunds). Money out = expenses and stock purchases paid from that account. Money moved between accounts (e.g. cash deposited to the bank) isn't tracked here.</p></div>`;
+    body = accCard + `<div class="stack">${dates.map((date) => { const rs = rows.filter((r) => r.business_date === date); return `<div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${fmtDate(date, { weekday: "long", month: "long", day: "numeric" })}</h2><b class="num" style="font-family:var(--display);font-size:22px">${peso(sum(rs, (r) => r.amount))}</b></div>
       <form data-f="recon" data-date="${date}"><table class="t" style="margin-top:8px"><thead><tr><th>Method</th><th class="r">Recorded</th><th class="r">Counted</th><th class="r">Difference</th></tr></thead><tbody>
       ${rs.map((r) => { const mid = methods.find((m) => m.name === r.payment_method)?.id; const diff = r.reconciled_amount != null ? round2(r.reconciled_amount - r.amount) : null; return `<tr><td>${esc(r.payment_method)}</td><td class="r num">${peso(r.amount)}</td><td class="r"><input class="in num" style="max-width:140px;text-align:right;min-height:36px" type="number" step="0.01" name="${mid}" data-exp="${r.amount}" value="${r.reconciled_amount ?? ""}" placeholder="count" aria-label="Counted ${esc(r.payment_method)}"></td><td class="r num" style="color:${diff == null ? "inherit" : diff === 0 ? "var(--g7)" : "var(--bad)"}">${diff == null ? "—" : (diff > 0 ? "+" : "") + peso(diff)}</td></tr>`; }).join("")}
       </tbody></table>${Staff.can("payments.reconcile") ? `<div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn sec sm">Save count</button></div>` : ""}</form></div>`; }).join("") || `<div class="card empty">No money collected in this period.</div>`}</div>`;
@@ -1956,7 +1966,7 @@ const tm = (name, v, attrs = "") => `<input class="in num" type="time" name="${n
 const isoDays = (name, sel_) => `<div class="row" style="gap:6px 12px">${DOW.map((d, i) => `<label class="check" style="align-items:center"><input type="checkbox" name="${name}" value="${i + 1}" ${sel_.includes(i + 1) ? "checked" : ""}>${d}</label>`).join("")}</div>`;
 Views.settings = async (root, params) => {
   const tab = params.get("tab") || "business";
-  const tabs = [["business", "Business & hours"], ["courts", "Courts"], ["pricing", "Court rental"], ["openplay", "Open Play"], ["booking", "Reservation & cancellation"], ["payments", "Payment methods"], ["pos", "POS & equipment"], ["expenses", "Expense categories"], ["messenger", "Messenger"], ["data", "Test & demo data"]];
+  const tabs = [["business", "Business & hours"], ["courts", "Courts"], ["pricing", "Court rental"], ["openplay", "Open Play"], ["booking", "Reservation & cancellation"], ["payments", "Payment methods"], ["pos", "POS & equipment"], ["expenses", "Expense categories"], ["messenger", "Messenger"], ["opening", "Opening balance"], ["data", "Test & demo data"]];
   const s = await q(sb.from("business_settings").select("*").eq("id", 1).single());
   const save = `<div class="row" style="justify-content:flex-end;margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><button class="btn">Save changes</button></div>`;
   let body = "", data = {};
@@ -2011,12 +2021,41 @@ Views.settings = async (root, params) => {
     ${field("“Payment received” message (sent when they submit payment)", `<textarea class="in" name="messenger_received_text" rows="6">${esc(s.messenger_received_text || "")}</textarea>`)}
     ${field("“Reserved” message (sent when you approve the payment)", `<textarea class="in" name="messenger_reserved_text" rows="6">${esc(s.messenger_reserved_text || "")}</textarea>`, "You can use {name}, {reference}, {when}, {details}, {amount} (payment sent), {balance} and {link} (their booking page). They're filled in for each customer.")}
     <div class="row" style="align-items:center"><button type="button" class="btn sec" data-a="mtest">Check Facebook connection</button><span class="muted" id="mtest-out" style="font-size:13.5px"></span></div>${save}</form>`;
+  if (tab === "opening") {
+    const [ob, methods, cats] = await Promise.all([rpc("get_opening_balance"), loadMethods(), q(sb.from("expense_categories").select("*").eq("is_active", true).order("sort_order"))]);
+    data.ob = ob; data.obMethods = methods.filter((m) => m.is_active || (ob?.cash || []).some((c) => c.payment_method_id === m.id));
+    data.obCats = cats.filter((c) => c.default_type !== "inventory");
+    const start = ob?.starts_on || PUB.today;
+    const pTo = ob?.period_to || addDays(start, -1), pFrom = ob?.period_from || addDays(pTo, -29);
+    const cashOf = (id) => (ob?.cash || []).find((c) => c.payment_method_id === id)?.amount ?? "";
+    const revOf = (k) => (ob?.revenue || []).find((r) => r.category === k) || {};
+    const expOf = (id) => (ob?.expenses || []).find((e) => e.category_id === id)?.amount ?? "";
+    const COGS = ["snacks", "drinks", "food", "other"];
+    body = `<form class="card pad-lg stack" data-f="opening">
+      <h2>Opening balance</h2>
+      <p class="muted" style="margin-top:-6px">For the time before you started using this app. Enter the money you had on the day the app took over, and one total for each kind of sale and expense from before that day. These totals show up in Reports, Profit &amp; Loss and investor profit sharing. You can come back and change them anytime.</p>
+      ${ob ? `<div class="sub" style="font-size:13.5px">Last saved ${fmtDT(ob.updated_at)}${ob.updated_by ? ` by ${esc(ob.updated_by)}` : ""}.</div>` : ""}
+      <div class="grid g2">${field("First day using the app", `<input class="in" type="date" name="starts_on" value="${start}" max="${addDays(PUB.today, 1)}" required>`, "Money on hand below is what you had on the morning of this day.")}</div>
+      <h3 style="margin:10px 0 0">1. Money on hand that morning</h3>
+      <p class="muted" style="margin:0;font-size:13.5px">Count the cash drawer and check each account's balance.</p>
+      <div class="grid g2">${data.obMethods.map((m) => field(esc(m.name), money("cash_" + m.id, cashOf(m.id), 'placeholder="0"'))).join("")}</div>
+      <h3 style="margin:14px 0 0">2. Totals from before the app</h3>
+      <div class="grid g2">${field("From", `<input class="in" type="date" name="period_from" value="${pFrom}">`)}${field("To (last day before the app)", `<input class="in" type="date" name="period_to" value="${pTo}">`)}</div>
+      <p class="label" style="margin:6px 0 0">Sales</p>
+      <div class="grid g2">${Object.keys(BUCKET_LABEL).map((k) => `<div class="sub stack" style="gap:8px">${field(esc(BUCKET_LABEL[k]) + " sales", money("rev_" + k, revOf(k).amount ?? "", 'placeholder="0"'))}${COGS.includes(k) ? field("Cost of the items sold (optional)", money("cogs_" + k, revOf(k).cogs ? revOf(k).cogs : "", 'placeholder="0"'), "What those items cost you to buy. Leave empty if you don't know.") : ""}</div>`).join("")}</div>
+      <p class="label" style="margin:10px 0 0">Expenses</p>
+      <div class="grid g2">${data.obCats.map((c) => field(`${esc(c.name)} <span class="muted" style="font-weight:500">· ${c.default_type === "capital" ? "capital" : "operating"}</span>`, money("exp_" + c.id, expOf(c.id), 'placeholder="0"'))).join("")}</div>
+      <div class="sub" style="font-size:13.5px"><b>Stock and equipment:</b> stock you bought for resale isn't an expense. Enter the snacks and drinks still on the shelf with <a href="#/staff/inventory">Inventory → Adjust stock</a> (with what they cost), and your paddles and balls with <a href="#/staff/equipment">Equipment Rentals → Set how many we own</a>.</div>
+      ${field("Notes (optional)", inp("notes", ob?.notes || "", 'maxlength="500" placeholder="e.g. from the notebook / GCash history"'))}
+      <div class="row" style="justify-content:flex-end;margin-top:8px;border-top:1px solid var(--line);padding-top:16px"><button class="btn">Save opening balance</button></div>
+    </form>`;
+  }
   if (tab === "data") { const owner = Staff.acct?.role === "owner";
     data.counts = owner ? await rpc("transaction_counts") : null;
     const c = data.counts, total = c ? Object.values(c).reduce((a, b) => a + Number(b), 0) : 0;
     const lines = c ? [["bookings", "bookings"], ["payments", "booking payments"], ["pos_sales", "POS sales"], ["rentals", "equipment rentals"], ["purchases", "purchases"], ["expenses", "expenses"], ["stock_moves", "stock movements"], ["cash_counts", "cash counts"], ["distributions", "profit distributions"]].filter(([k]) => Number(c[k]) > 0).map(([k, l]) => `<li><b>${c[k]}</b> ${l}</li>`).join("") : "";
     body = (owner ? `<form class="card pad-lg stack" data-f="clearall" style="border:1.5px solid var(--bad)"><h2>Clear test transactions</h2>
-      <p class="muted">Use this once before you open, to wipe everything you entered while testing. It removes <b>all</b> bookings, payments, POS sales, equipment rentals, purchases, expenses, stock movements, cash counts and profit distributions, and restarts booking numbers from 0001. Product stock goes back to 0 and all paddles and balls are marked available — enter your real stock afterwards with Purchases or Adjust stock.</p>
+      <p class="muted">Use this once before you open, to wipe everything you entered while testing. It removes <b>all</b> bookings, payments, POS sales, equipment rentals, purchases, expenses, stock movements, cash counts, profit distributions and the opening balance, and restarts booking numbers from 0001. Product stock goes back to 0 and all paddles and balls are marked available — enter your real stock afterwards with Purchases or Adjust stock.</p>
       <p class="muted">Kept: settings, prices, courts, Open Play session settings, products, payment methods, equipment, investors, team accounts and the audit log.</p>
       ${total ? `<div class="sub"><p style="margin:0 0 6px"><b>Will be removed:</b></p><ul style="margin:0;padding-left:18px">${lines}</ul></div>
       ${field("Type DELETE to confirm", inp("confirm", "", 'autocomplete="off" required placeholder="DELETE"'), "This can't be undone.")}
@@ -2110,6 +2149,16 @@ Views.settings = async (root, params) => {
         for (const c of data.ec) await q(sb.from("expense_categories").update({ name: g("n_" + c.id), default_type: g("t_" + c.id), report_group: g("g_" + c.id), staff_allowed: g("s_" + c.id) === "on", is_active: g("a_" + c.id) === "on" }).eq("id", c.id).select());
         if (g("new_ec")?.trim()) await q(sb.from("expense_categories").insert({ name: g("new_ec").trim(), sort_order: data.ec.length + 1 }).select());
       }, "Expense categories saved.");
+      if (ok) reload();
+    },
+    opening: async (f, d) => {
+      const n = (v) => (v === "" || v == null ? 0 : Number(v));
+      const ok = await run(() => rpc("save_opening_balance", {
+        p_starts_on: d.starts_on, p_period_from: d.period_from || null, p_period_to: d.period_to || null,
+        p_cash: data.obMethods.map((m) => ({ payment_method_id: m.id, amount: n(d["cash_" + m.id]) })),
+        p_revenue: Object.keys(BUCKET_LABEL).map((k) => ({ category: k, amount: n(d["rev_" + k]), cogs: n(d["cogs_" + k]) })),
+        p_expenses: data.obCats.map((c) => ({ category_id: c.id, amount: n(d["exp_" + c.id]) })),
+        p_notes: d.notes || null }), "Opening balance saved. It's now in your reports.");
       if (ok) reload();
     },
     clearall: async (f) => {
