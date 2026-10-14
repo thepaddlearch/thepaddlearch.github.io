@@ -546,6 +546,24 @@ function siteShell(inner) {
 }
 const minRate = () => Math.min(...(PUB.rates || []).map((r) => Number(r.rate_per_hour)));
 const PAY_ONLINE = () => PUB.payment_methods || [];
+const qrUrl = (path) => (path && sb ? sb.storage.from("payment-qr").getPublicUrl(path).data.publicUrl : "");
+// Save a QR image to the phone/computer. Falls back to opening it (press and hold to save).
+async function saveQr(url, name) {
+  try {
+    const r = await fetch(url, { mode: "cors" }); if (!r.ok) throw new Error("fetch");
+    const blob = await r.blob(), ext = (blob.type.split("/")[1] || "png").replace("jpeg", "jpg");
+    const file = new File([blob], `${name}.${ext}`, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+      await navigator.share({ files: [file], title: name }); return;   // phone: "Save image" in the share sheet
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = file.name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    toast("QR code saved.");
+  } catch (e) {
+    if (e && e.name === "AbortError") return;
+    window.open(url, "_blank", "noopener"); toast("Press and hold the QR code to save it.");
+  }
+}
 const LEVELS = [["all_levels", "All levels"], ["beginner", "Beginner"], ["novice", "Novice"], ["intermediate", "Intermediate"], ["intermediate_advanced", "Intermediate to Advanced"], ["advanced", "Advanced"], ["high_advanced", "High Advanced"], ["expert", "Expert"], ["professional", "Professional"]];
 const levelLabel = (k) => (LEVELS.find((l) => l[0] === k) || LEVELS[0])[1];
 const levelTag = (k) => `<span class="tag lvl">${esc(levelLabel(k))}</span>`;
@@ -672,7 +690,10 @@ const Site = {
       ${(b.payments || []).filter((p) => p.status === "rejected").map((p) => notice(`A payment of ${peso(p.amount)} couldn't be confirmed${p.rejection_reason ? `: “${esc(p.rejection_reason)}”` : ""}. Please upload a clearer receipt.`, "warn")).join("")}
       ${canPay ? `<div class="card stack"><h2>${full ? "Pay" : "Pay the reservation fee"}: ${peso(needFee)}</h2>
         <p class="muted">${esc(PUB.payment_instructions || "")}</p>
-        <div class="grid g2">${PAY_ONLINE().map((m) => `<div class="pay-acct"><p class="eyebrow">${esc(m.name)}</p>${m.bank_name ? `<div>${esc(m.bank_name)}</div>` : ""}<div><b>${esc(m.account_name || "")}</b></div><div class="mono" style="font-size:18px">${esc(m.account_number || "")}</div>${m.account_number ? `<button class="btn ghost sm" type="button" data-a="copy" data-t="${esc(m.account_number)}">Copy number</button>` : ""}${m.instructions ? `<p class="muted" style="font-size:12.5px">${esc(m.instructions)}</p>` : ""}</div>`).join("")}</div>
+        <div class="grid g2">${PAY_ONLINE().map((m) => { const qr = qrUrl(m.qr_image_path); return `<div class="pay-acct"><p class="eyebrow">${esc(m.name)}</p>${m.bank_name ? `<div>${esc(m.bank_name)}</div>` : ""}<div><b>${esc(m.account_name || "")}</b></div><div class="mono" style="font-size:18px">${esc(m.account_number || "")}</div>
+          ${qr ? `<img src="${esc(qr)}" alt="${esc(m.name)} QR code" loading="lazy" style="display:block;width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;margin:10px 0 6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px">` : ""}
+          <div class="row" style="gap:6px;flex-wrap:wrap">${m.account_number ? `<button class="btn ghost sm" type="button" data-a="copy" data-t="${esc(m.account_number)}">Copy number</button>` : ""}${qr ? `<button class="btn ghost sm" type="button" data-a="saveqr" data-u="${esc(qr)}" data-n="${esc(("PaddleArch-" + m.name).replace(/[^A-Za-z0-9-]+/g, "-"))}">Save QR code</button>` : ""}</div>
+          ${qr ? `<p class="muted" style="font-size:12.5px;margin-top:4px">Save the QR, then in your ${esc(m.kind === "bank" ? "bank" : m.name)} app tap <b>Scan QR</b> and choose it from your photos.</p>` : ""}${m.instructions ? `<p class="muted" style="font-size:12.5px">${esc(m.instructions)}</p>` : ""}</div>`; }).join("")}</div>
         <form class="stack" data-f="pay">
           <div class="grid g2">${field("How did you pay?", sel("method", PAY_ONLINE().map((m) => [m.id, m.name]), PAY_ONLINE()[0]?.id))}${field("Amount sent", money("amount", needFee, `required max="${b.balance_due - submitted}"`))}</div>
           ${field("Reference number (from your receipt)", inp("refno", "", 'placeholder="e.g. 1234 567 890"'))}
@@ -690,6 +711,7 @@ const Site = {
     });
     wire(APP, {
       copy: (el) => copyText(el.dataset.t),
+      saveqr: (el) => saveQr(el.dataset.u, el.dataset.n),
       pay: async (f, d) => {
         const file = f.querySelector("input[name=proof]").files[0];
         const ok = await run(async () => {
@@ -2001,6 +2023,9 @@ Views.settings = async (root, params) => {
     body = `<form class="card pad-lg stack" data-f="payments"><p class="muted">Methods marked <b>Online</b> are shown to customers paying for their booking. <b>Counter</b> methods appear in the POS.</p>
       ${data.pm.map((m) => `<div class="sub stack" style="gap:8px"><div class="grid g4">${field("Name", inp("name_" + m.id, m.name, "required"))}${field("Type", sel("kind_" + m.id, [["cash", "Cash"], ["gcash", "GCash"], ["bank", "Bank"], ["ewallet", "E-wallet"], ["card", "Card"], ["other", "Other"]], m.kind))}${field("Account name", inp("acct_" + m.id, m.account_name || ""))}${field("Account / mobile no.", inp("num_" + m.id, m.account_number || ""))}</div>
         <div class="grid g2">${field("Bank (for bank transfer)", inp("bank_" + m.id, m.bank_name || ""))}${field("Extra instructions", inp("ins_" + m.id, m.instructions || ""))}</div>
+        ${m.kind === "cash" ? "" : `<div class="row" style="gap:12px;align-items:center;flex-wrap:wrap">${m.qr_image_path ? `<img src="${esc(qrUrl(m.qr_image_path))}" alt="QR" style="width:84px;height:84px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px">` : ""}
+          ${field(m.qr_image_path ? "Replace QR code" : "QR code (optional)", `<input class="in" type="file" name="qr_${m.id}" accept="image/png,image/jpeg,image/webp">`, "Screenshot of your GCash/bank QR. PNG or JPG, up to 2 MB. Customers can scan or save it.")}
+          ${m.qr_image_path ? `<label class="check"><input type="checkbox" name="qrdel_${m.id}"> Remove QR</label>` : ""}</div>`}
         <div class="row"><label class="check"><input type="checkbox" name="online_${m.id}" ${m.use_for_online ? "checked" : ""}> Online (bookings)</label><label class="check"><input type="checkbox" name="pos_${m.id}" ${m.use_for_pos ? "checked" : ""}> Counter / POS</label><label class="check"><input type="checkbox" name="active_${m.id}" ${m.is_active ? "checked" : ""}> Active</label></div></div>`).join("")}
       <div class="grid g2">${field("Add a method", inp("new_name", "", 'placeholder="e.g. Maya"'))}${field("Type", sel("new_kind", [["ewallet", "E-wallet"], ["gcash", "GCash"], ["bank", "Bank"], ["card", "Card"], ["other", "Other"]], "ewallet"))}</div>
       ${field("Payment instructions for customers", `<textarea class="in" name="payment_instructions">${esc(s.payment_instructions || "")}</textarea>`)}${save}</form>`; }
@@ -2127,6 +2152,17 @@ Views.settings = async (root, params) => {
     payments: async (f) => {
       const fd = new FormData(f), g = (k) => fd.get(k);
       const ok = await run(async () => {
+        for (const m of data.pm) {
+          const file = fd.get("qr_" + m.id);
+          if (file && file.size) {
+            if (!/^image\/(png|jpeg|webp)$/.test(file.type)) fail(`The QR for ${m.name} must be a PNG or JPG image.`);
+            if (file.size > 2 * 1024 * 1024) fail(`The QR for ${m.name} is over 2 MB. Please use a smaller screenshot.`);
+            const path = `${m.id}/${Date.now()}.${file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg"}`;
+            const up = await sb.storage.from("payment-qr").upload(path, file, { contentType: file.type, upsert: false });
+            if (up.error) throw up.error;
+            await q(sb.from("payment_methods").update({ qr_image_path: path }).eq("id", m.id).select());
+          } else if (g("qrdel_" + m.id) === "on") await q(sb.from("payment_methods").update({ qr_image_path: null }).eq("id", m.id).select());
+        }
         for (const m of data.pm) await q(sb.from("payment_methods").update({ name: g("name_" + m.id).trim(), kind: g("kind_" + m.id), account_name: g("acct_" + m.id) || null, account_number: g("num_" + m.id) || null, bank_name: g("bank_" + m.id) || null, instructions: g("ins_" + m.id) || null, use_for_online: g("online_" + m.id) === "on", use_for_pos: g("pos_" + m.id) === "on", is_active: g("active_" + m.id) === "on" }).eq("id", m.id).select());
         if (g("new_name")?.trim()) await q(sb.from("payment_methods").insert({ name: g("new_name").trim(), kind: g("new_kind"), sort_order: data.pm.length + 1 }).select());
         await q(sb.from("business_settings").update({ payment_instructions: g("payment_instructions") || null }).eq("id", 1).select());
