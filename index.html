@@ -1633,10 +1633,11 @@ function qRender() {
     ${X.upnext.length ? `<div class="stack">${X.upnext.map((m, i) => `<div class="sub stack" style="gap:10px"><div class="row" style="justify-content:space-between"><div class="row" style="gap:8px"><b>Game ${i + 1}</b>${m.streak ? `<span class="tag lvl">WINNERS STAY</span>` : ""}</div>
         ${edit ? `<div class="row" style="gap:6px">${sel("uc-" + m.id, courtOpts, m.court_id || "", `data-a="court" data-m="${m.id}" style="width:auto;min-height:36px;font-size:13px"`)}
           <button class="btn ghost sm" data-a="mv" data-k="match" data-id="${m.id}" data-dir="up" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button><button class="btn ghost sm" data-a="mv" data-k="match" data-id="${m.id}" data-dir="down" aria-label="Move down" ${i === X.upnext.length - 1 ? "disabled" : ""}>↓</button>
-          <button class="btn ghost sm" data-a="cancelm" data-m="${m.id}" aria-label="Remove game">${ic("close")}</button></div>` : `<span class="muted">${esc(d.courts.find((c) => c.id === m.court_id)?.name || "Any court")}</span>`}</div>
+          ${m.players.length === 4 && !m.streak ? `<button class="btn sec sm" data-a="shuffle" data-m="${m.id}" title="Mix the teams">⇄ Shuffle</button>` : ""}<button class="btn ghost sm" data-a="cancelm" data-m="${m.id}" aria-label="Remove game">${ic("close")}</button></div>` : `<span class="muted">${esc(d.courts.find((c) => c.id === m.court_id)?.name || "Any court")}</span>`}</div>
         ${qTeams(m, edit)}
         ${edit ? `<button class="btn ${m.players.length < 4 ? "sec" : ""}" data-a="start" data-m="${m.id}" ${m.players.length < 4 ? "disabled" : ""}>${m.players.length < 4 ? `Needs ${4 - m.players.length} more player${4 - m.players.length === 1 ? "" : "s"}` : `Start on ${esc(d.courts.find((c) => c.id === m.court_id)?.name || "the next free court")}`}</button>` : ""}</div>`).join("")}</div>`
-      : `<p class="muted">No games lined up. ${X.line.length >= 4 ? "Tap <b>Make next game</b> to take the next 4 from the line." : `A game needs 4 checked-in players waiting (${X.line.length} now).`}</p>`}</div>`;
+      : `<p class="muted">${s.autofill && !over ? `Games line up here by themselves — one per court, with mixed teams — as soon as 4 players are waiting (${X.line.length} now).` : X.line.length >= 4 ? "Tap <b>Make next game</b> to take the next 4 from the line." : `A game needs 4 checked-in players waiting (${X.line.length} now).`}</p>`}
+    ${X.upnext.length && s.autofill && !over ? `<p class="muted" style="font-size:12.5px;margin-top:10px">Lined up automatically from the front of the line with mixed teams. Tap a name to swap someone in, or ⇄ Shuffle to mix the teams again.</p>` : ""}</div>`;
 
   const lineRow = (p, i) => `<div class="qrow"><span class="pos">${i + 1}</span><button class="nm linkish" data-a="pl" data-id="${p.id}"><b>${esc(p.name)} ${qStars(p.skill)}</b><small>${qRec(p)} · waiting ${qMins(p.last_played || p.checked_in_at)}${p.source !== "booking" ? ` · ${p.source === "reclub" ? "Reclub" : "walk-in"}` : ""}</small></button>
     ${edit ? `<button class="btn ghost sm" data-a="mv" data-k="player" data-id="${p.id}" data-dir="up" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button><button class="btn ghost sm" data-a="mv" data-k="player" data-id="${p.id}" data-dir="down" aria-label="Move down" ${i === X.line.length - 1 ? "disabled" : ""}>↓</button><button class="btn sec sm" data-a="st" data-id="${p.id}" data-st="break">Break</button>` : ""}</div>`;
@@ -1662,7 +1663,7 @@ function qRender() {
     <form class="stack" data-f="qset" style="margin-top:12px">
       ${field("After each game", sel("mode", [["rotate", "Everyone goes back to the line"], ["winners_stay", "Winners stay on court"]], s.mode))}
       ${field("Winners can stay for", suffix("win_limit", s.win_limit, "wins", `min="1" max="10"`), "After this many wins in a row, the winners go back to the line too.")}
-      <label class="check"><input type="checkbox" name="autofill" ${s.autofill ? "checked" : ""}> Line up the next game automatically when a court finishes</label>
+      <label class="check"><input type="checkbox" name="autofill" ${s.autofill ? "checked" : ""}> Line up the next games automatically (one per court, mixed teams) — shows on the big screen</label>
       <div><button class="btn sec">Save rotation</button></div></form></details>` : "";
 
   const stats = `<div class="row" style="gap:8px;margin-bottom:16px">${levelTag(s.level)}<span class="tag">${X.here} checked in</span><span class="tag">${X.line.length} waiting</span><span class="tag">${X.playing.length * 4} playing</span><span class="tag">${X.notHere.length} not here yet</span></div>`;
@@ -1682,7 +1683,8 @@ function qRender() {
     win: (el) => qAct("queue_finish", { p_match: el.dataset.m, p_winner: el.dataset.w }, `Team ${el.dataset.w} wins — saved.`),
     nogame: (el) => { if (confirm("End this game without a winner? The players go back to their places in line.")) qAct("queue_finish", { p_match: el.dataset.m, p_winner: null }, "Game ended — no result."); },
     court: (el) => qAct("queue_set_court", { p_match: el.dataset.m, p_court: el.value || null }, "Court changed."),
-    cancelm: (el) => qAct("queue_cancel_match", { p_match: el.dataset.m }, "Game removed."),
+    cancelm: (el) => qAct("queue_cancel_match", { p_match: el.dataset.m }, QV.data.session.autofill ? "Game removed — a new one is lined up from the line." : "Game removed."),
+    shuffle: (el) => qAct("queue_shuffle", { p_match: el.dataset.m }, "Teams shuffled."),
     mv: (el) => qAct("queue_move", { p_kind: el.dataset.k, p_id: el.dataset.id, p_dir: el.dataset.dir }),
     st: (el) => qAct("queue_set_status", { p_player: el.dataset.id, p_status: el.dataset.st }, el.dataset.st === "here" ? "Checked in — added to the line." : el.dataset.st === "break" ? "On a break — keeps their place." : "Saved."),
     pl: (el) => qPlayerModal(el.dataset.id),
@@ -1708,7 +1710,7 @@ function qSlotModal(matchId, team, slot) {
       <p class="eyebrow" style="margin-bottom:6px">Waiting line</p>
       ${X.line.filter((p) => ok(p.name)).map((p, i) => `<button class="qp" style="width:100%;margin-bottom:6px" data-pick="${p.id}"><span>${i + 1}. ${esc(p.name)} ${qStars(p.skill)}</span><span class="muted" style="font-size:12px;font-weight:600">${qRec(p)}</span></button>`).join("") || `<p class="muted" style="margin-bottom:8px">Nobody waiting.</p>`}
       ${other.filter((p) => ok(p.name)).length ? `<p class="eyebrow" style="margin:12px 0 6px">Switch with a player in another spot</p>${other.filter((p) => ok(p.name)).map((p) => `<button class="qp" style="width:100%;margin-bottom:6px" data-pick="${p.player_id}"><span>${esc(p.name)}</span><span class="muted" style="font-size:12px;font-weight:600">${label(p.g)} · Team ${p.team} ⇄</span></button>`).join("")}` : ""}
-      ${cur ? `<div class="divider"></div><button class="btn ghost" data-pick="">${ic("close")} Empty this spot (${esc(cur.name)} goes back to the line)</button>` : ""}`;
+      ${cur && !m.auto ? `<div class="divider"></div><button class="btn ghost" data-pick="">${ic("close")} Empty this spot (${esc(cur.name)} goes back to the line)</button>` : ""}`;
     },
     bind: (mo) => {
       const inp = mo.querySelector("#qsf");
@@ -1786,7 +1788,7 @@ function qRenderTV() {
   el.innerHTML = `<div class="qtv-top"><div class="row" style="gap:14px"><img src="${MONO}" alt="" style="width:54px;filter:brightness(0) invert(1)"><div><b style="font-family:var(--display);font-size:26px">${esc(PUB.business_name)} · Open Play</b><div style="opacity:.75">${fmtRange(d.session.starts_at, d.session.ends_at)}</div></div></div><button class="btn sec" data-x>${ic("close")} Close</button></div>
     <div class="qtv-courts">${d.courts.map((c) => { const m = X.playing.find((x) => x.court_id === c.id);
       return `<div class="qtv-court"><div class="qtv-cn">${esc(c.name)}</div>${m ? `<div class="qtv-teams"><div class="qtv-t">${team(m, "A")}</div><div class="qtv-vs">vs</div><div class="qtv-t">${team(m, "B")}</div></div><div style="opacity:.7;margin-top:8px">${qMins(m.started_at)}</div>` : `<div style="font-size:28px;opacity:.7;padding:18px 0">Free</div>`}</div>`; }).join("")}</div>
-    <div class="qtv-low"><div><h2>Up next</h2>${X.upnext.slice(0, 4).map((m, i) => `<div class="qtv-next"><span class="qtv-n">${i + 1}</span><span>${qNames(m, "A")} <i>vs</i> ${qNames(m, "B")}</span>${m.court_id ? `<span style="opacity:.7">${esc(d.courts.find((c) => c.id === m.court_id)?.name || "")}</span>` : ""}</div>`).join("") || `<p style="opacity:.7">—</p>`}</div>
+    <div class="qtv-low"><div><h2>Up next</h2>${X.upnext.slice(0, 4).map((m, i) => `<div class="qtv-next"><span class="qtv-n">${i + 1}</span><span>${qNames(m, "A")} <i>vs</i> ${qNames(m, "B")}</span><span style="opacity:.7;margin-left:auto;font-size:.8em;white-space:nowrap">${m.court_id ? esc(d.courts.find((c) => c.id === m.court_id)?.name || "") : "Next free court"}</span></div>`).join("") || `<p style="opacity:.7">—</p>`}</div>
       <div><h2>In line</h2><ol class="qtv-line">${X.line.slice(0, 16).map((p) => `<li>${esc(p.name)}</li>`).join("") || `<p style="opacity:.7">—</p>`}</ol></div></div>`;
 }
 
