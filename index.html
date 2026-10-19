@@ -190,6 +190,54 @@ table.t{width:100%;border-collapse:collapse;font-size:14px}
 .qty button:hover{background:var(--g0)}
 .qty span{min-width:30px;text-align:center;font-weight:800}
 
+/* ---------- Open Play queue ---------- */
+.qcourts{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.qcourt{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:10px}
+.qcourt.live{border-color:var(--g5);box-shadow:0 0 0 3px var(--g1)}
+.qcourt .ch{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.qcourt .ch .muted{display:inline-flex;align-items:center;gap:4px;font-size:13px}
+.qcourt .ch svg{width:14px;height:14px}
+.qgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.qgrid{grid-template-columns:minmax(0,1fr)}}
+.qteams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center}
+.qteam{display:flex;flex-direction:column;gap:6px;background:var(--g0);border:1px solid var(--g2);border-radius:12px;padding:6px}
+.qteam.b{background:var(--clay-1);border-color:#E8D6B5}
+.qvs{font-family:var(--display);font-weight:700;color:var(--muted);font-size:14px}
+.qp{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 9px;font-weight:700;font-size:14px;min-height:42px;min-width:0}
+.qp:hover:not([disabled]){border-color:var(--g5)}
+.qp[disabled]{cursor:default}
+.qp.empty{border-style:dashed;color:var(--muted);justify-content:center;font-weight:600;font-size:13px}
+.qp svg{width:14px;height:14px}
+.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.stars{color:var(--clay);font-size:11px;letter-spacing:-1px;white-space:nowrap}
+.qwin{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qwin .btn{min-height:52px;font-size:15px}
+.qline{display:flex;flex-direction:column}
+.qrow{display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.qrow:last-child{border-bottom:0}
+.qrow .pos{width:28px;height:28px;border-radius:50%;background:var(--g1);color:var(--g8);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.qrow .nm{flex:1;min-width:0;text-align:left}
+button.nm{all:unset;box-sizing:border-box;cursor:pointer;flex:1;min-width:0}
+.qrow .nm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qrow .nm small{display:block;color:var(--muted);font-size:12.5px}
+.qchips{display:flex;flex-wrap:wrap;gap:8px}
+.qchip{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line-2);border-radius:99px;padding:8px 14px;font-weight:700;font-size:14px;min-height:44px}
+.qchip:hover{border-color:var(--g5);background:var(--g0)}
+.qchip .ci{color:var(--g7);font-size:11px;font-weight:800;letter-spacing:.04em}
+.qtv{position:fixed;inset:0;z-index:80;background:var(--g9);color:#fff;overflow:auto;padding:clamp(16px,3vw,36px);display:flex;flex-direction:column;gap:24px}
+.qtv h2{color:#fff;font-size:26px;margin-bottom:12px}
+.qtv-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.qtv-courts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.qtv-court{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:20px;text-align:center}
+.qtv-cn{font-family:var(--display);font-size:30px;font-weight:700;color:var(--g2);margin-bottom:10px}
+.qtv-teams{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;font-size:clamp(20px,2.4vw,30px);font-weight:800;line-height:1.3}
+.qtv-vs{opacity:.6;font-family:var(--display);font-size:20px}
+.qtv-low{display:grid;grid-template-columns:1.3fr 1fr;gap:24px}
+@media (max-width:800px){.qtv-low{grid-template-columns:1fr}}
+.qtv-next{display:flex;gap:14px;align-items:center;font-size:clamp(18px,2vw,26px);font-weight:700;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.15)}
+.qtv-next i{opacity:.6;font-style:normal;font-weight:500}
+.qtv-n{width:38px;height:38px;border-radius:50%;background:var(--g2);color:var(--g9);display:grid;place-items:center;font-weight:800;flex:none}
+.qtv-line{columns:2;font-size:clamp(17px,1.8vw,24px);font-weight:700;margin:0;padding-left:28px;line-height:1.7}
 /* ---------- modal / toast ---------- */
 .modal-bg{position:fixed;inset:0;background:rgba(24,36,28,.45);z-index:60;display:flex;justify-content:flex-end}
 .modal{background:var(--bg);width:min(560px,100%);height:100%;overflow:auto;box-shadow:var(--lift);padding-block:20px 40px;padding-inline:clamp(16px,3vw,26px);animation:slide .18s ease-out}
@@ -389,6 +437,7 @@ const ICON = {
   court: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 12h16M12 3v6M12 15v6"/>',
   openplay: '<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 19c.7-3 2.8-4.7 5.5-4.7s4.8 1.7 5.5 4.7M13.8 15c.7-.4 1.4-.6 2.2-.6 2.7 0 4.8 1.7 5.5 4.6"/>',
   bookings: '<path d="M4 5h16M4 10h16M4 15h10M4 20h7"/>',
+  queue: '<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="13" r="2.5"/><path d="M3 21c.5-2.2 1.6-3.3 3-3.3s2.5 1.1 3 3.3"/><path d="M12 6h9M12 13h9M14 20h7"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   pos: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M8 18h8"/>',
   paddle: '<rect x="6" y="2.5" width="11" height="12" rx="4.5" transform="rotate(20 11.5 8.5)"/><path d="m9.2 14.8-2.7 6.2"/>',
@@ -935,6 +984,7 @@ const Staff = {
     { key: "dashboard", label: "Dashboard", icon: "dashboard" },
     { key: "courts", label: "Court Rentals", icon: "court", any: ["bookings.view", "schedule.view"] },
     { key: "open-play", label: "Open Play", icon: "openplay", any: ["bookings.view", "schedule.view"] },
+    { key: "queue", label: "Open Play Queue", icon: "queue", any: ["bookings.checkin", "bookings.view", "schedule.view"] },
     { key: "bookings", label: "All Bookings", icon: "bookings", any: ["bookings.view"] },
     { sec: "Counter" },
     { key: "pos", label: "POS", icon: "pos", any: ["pos.sell"] },
@@ -1481,7 +1531,7 @@ Views["open-play"] = async (root, params) => {
     <div class="stack">${day.sessions.map((s) => {
       const live = s.players.filter((b) => !["cancelled", "expired"].includes(b.status));
       const inCount = sum(live.filter((b) => ["checked_in", "completed"].includes(b.status)), (b) => b.players_checked_in ?? b.players);
-      return `<div class="card"><div class="row" style="justify-content:space-between"><div><div class="row" style="gap:8px"><h2 style="margin:0">${fmtRange(s.starts_at, s.ends_at)}</h2>${levelTag(s.level)}</div><p class="muted">${s.booked} / ${s.capacity} spots booked · ${Math.max(s.capacity - s.booked, 0)} remaining · ${inCount} checked in · ${peso(s.price)} per player</p></div>${s.capacity > 0 && s.booked >= s.capacity ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : ""}</div>
+      return `<div class="card"><div class="row" style="justify-content:space-between"><div><div class="row" style="gap:8px"><h2 style="margin:0">${fmtRange(s.starts_at, s.ends_at)}</h2>${levelTag(s.level)}<a class="btn sec sm" href="#/staff/queue?d=${date}&s=${s.id}">${ic("queue")} Queue</a></div><p class="muted">${s.booked} / ${s.capacity} spots booked · ${Math.max(s.capacity - s.booked, 0)} remaining · ${inCount} checked in · ${peso(s.price)} per player</p></div>${s.capacity > 0 && s.booked >= s.capacity ? `<span class="tag" style="background:var(--ink);color:var(--bg)">SOLD OUT</span>` : ""}</div>
         <div class="bar" style="margin:10px 0 14px"><i style="width:${s.capacity ? Math.min(100, (s.booked / s.capacity) * 100) : 0}%"></i></div>
         ${canCourts ? `<form class="row" data-f="courts" data-sid="${s.id}" style="margin-bottom:12px"><span class="muted" style="font-size:13px">Courts used:</span>${day.courts.map((c) => `<label class="check" style="align-items:center"><input type="checkbox" name="c" value="${c.id}" ${s.courts.includes(c.id) ? "checked" : ""}> ${esc(c.name)}</label>`).join("")}<button class="btn sec sm">Save</button><span class="muted" style="font-size:12.5px">${s.per_court} players per court</span></form>
         <div class="row" style="margin-bottom:12px"><span class="muted" style="font-size:13px">Level:</span>${sel("level", LEVELS, s.level, `data-a="lvl" data-sid="${s.id}" id="lvl-${s.id}" style="width:auto;min-height:36px"`)}<span class="muted" style="font-size:12.5px">This day only — the regular level is in Settings.</span></div>` : `<p class="muted" style="font-size:13px;margin-bottom:10px">Courts: ${esc(day.courts.filter((c) => s.courts.includes(c.id)).map((c) => c.name).join(", ") || "none")}</p>`}
@@ -1493,6 +1543,252 @@ Views["open-play"] = async (root, params) => {
     courts: async (f) => { const courts = new FormData(f).getAll("c"); const ok = await run(() => rpc("set_open_play_session_courts", { p_session: f.dataset.sid, p_courts: courts }), (r) => `Saved — capacity ${r.capacity} players.`); if (ok) Views["open-play"](root, params); },
   });
 };
+
+// ---------------------------------------------------------------- Open Play queue (PickleQ-style)
+// Names come in automatically from reserved Open Play bookings (and staff can add Reclub / walk-in
+// players). Checked-in players wait in line; staff make games of 4, send them to a court, tap the
+// winning team, and the players go back to the line. All rules live in the database (queue_* functions).
+const QV = { root: null, date: null, sid: null, sessions: [], data: null, timer: null, sig: "", tv: false, filter: "" };
+const qStars = (n) => n ? `<span class="stars" title="${n} of 5">${"★".repeat(n)}</span>` : "";
+const qMins = (iso) => { if (!iso) return ""; const m = Math.max(0, Math.round((Date.now() - new Date(iso)) / 6e4)); return m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${m % 60}m`; };
+const qRec = (p) => p.games ? `${p.games} game${p.games === 1 ? "" : "s"} · ${p.wins} win${p.wins === 1 ? "" : "s"}` : "No games yet";
+function qPick(list) {
+  const now = Date.now();
+  return (list.find((s) => new Date(s.starts_at) <= now && new Date(s.ends_at) > now) || list.find((s) => new Date(s.ends_at) > now) || list[list.length - 1] || {}).id || null;
+}
+Views.queue = async (root, params) => {
+  const date = params.get("d") || PUB.today;
+  QV.root = root; QV.date = date;
+  QV.sessions = await rpc("queue_sessions", { p_date: date });
+  let sid = params.get("s");
+  if (!QV.sessions.some((s) => s.id === sid)) sid = qPick(QV.sessions);
+  QV.sid = sid;
+  QV.data = sid ? await rpc("staff_queue", { p_session: sid }) : null;
+  QV.sig = JSON.stringify(QV.data);
+  Staff.refreshPage = () => Views.queue(root, params);
+  qRender();
+  qPoll();
+};
+function qPoll() {
+  clearInterval(QV.timer);
+  QV.timer = setInterval(async () => {
+    if (!location.hash.startsWith("#/staff/queue")) { clearInterval(QV.timer); QV.tv = false; $("#qtv")?.remove(); return; }
+    if (document.hidden || MODAL || !QV.sid) return;
+    const a = document.activeElement;
+    if (a && QV.root?.contains(a) && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
+    try {
+      const d = await rpc("staff_queue", { p_session: QV.sid }), sig = JSON.stringify(d);
+      if (sig !== QV.sig) { QV.data = d; QV.sig = sig; qRender(); }
+      else if (QV.tv) qRenderTV();
+    } catch (e) { console.warn(e); }
+  }, 8000);
+}
+async function qAct(name, args, ok) {
+  const r = await run(() => rpc(name, args), ok);
+  if (r && r.session) { QV.data = r; QV.sig = JSON.stringify(r); qRender(); }
+  return r;
+}
+function qDerive() {
+  const d = QV.data, P = d.players, byId = Object.fromEntries(P.map((p) => [p.id, p]));
+  const playing = d.matches.filter((m) => m.status === "playing");
+  const upnext = d.matches.filter((m) => m.status === "up_next").sort((a, b) => a.position - b.position);
+  const line = P.filter((p) => p.status === "here" && !p.match_id).sort((a, b) => a.queue_pos - b.queue_pos);
+  return { d, P, byId, playing, upnext, line,
+    rest: P.filter((p) => p.status === "break" && !p.match_id), notHere: P.filter((p) => p.status === "not_here"), left: P.filter((p) => p.status === "left"),
+    here: P.filter((p) => p.status === "here" || p.status === "break").length };
+}
+function qSlot(m, team, slot, edit) {
+  const x = m.players.find((p) => p.team === team && p.slot === slot);
+  if (!x) return edit ? `<button class="qp empty" data-a="slot" data-m="${m.id}" data-t="${team}" data-s="${slot}">${ic("plus")} Add player</button>` : `<span class="qp empty">Open spot</span>`;
+  return `<button class="qp" ${edit ? `data-a="slot" data-m="${m.id}" data-t="${team}" data-s="${slot}"` : "disabled"} title="${edit ? "Replace or switch" : ""}"><span class="ell">${esc(x.name)}</span>${qStars(x.skill)}</button>`;
+}
+const qTeams = (m, edit) => `<div class="qteams"><div class="qteam">${qSlot(m, "A", 1, edit)}${qSlot(m, "A", 2, edit)}</div><span class="qvs">vs</span><div class="qteam b">${qSlot(m, "B", 1, edit)}${qSlot(m, "B", 2, edit)}</div></div>`;
+const qNames = (m, team) => m.players.filter((p) => p.team === team).map((p) => esc(p.name)).join(" & ") || "—";
+
+function qRender() {
+  const root = QV.root; if (!root || !document.body.contains(root)) return;
+  const base = "#/staff/queue";
+  const tabs = QV.sessions.length ? `<div class="tabs">${QV.sessions.map((s) => `<button data-a="sess" data-id="${s.id}" aria-pressed="${s.id === QV.sid}">${fmtRange(s.starts_at, s.ends_at)}${s.here ? ` · ${s.here} here` : ""}</button>`).join("")}</div>` : "";
+  const head = pageHead("Open Play Queue", "Checked-in players wait in line. Make a game, send it to a court, tap who won — they go back to the line.",
+    QV.data?.can_edit ? `<button class="btn sec" data-a="tv">${ic("dashboard")} Big screen</button><button class="btn" data-a="add">${ic("plus")} Add players</button>` : "");
+  if (!QV.sid) { root.innerHTML = `${head}${dateNav(QV.date, base)}<div class="card empty">No Open Play sessions on this day.</div>`; return wire(root, { pickdate }); }
+  const X = qDerive(), d = X.d, s = d.session, edit = d.can_edit;
+  const courtOpts = [["", "Any free court"], ...d.courts.map((c) => [c.id, c.name])];
+  const over = new Date(s.ends_at) < Date.now();
+
+  const courts = d.courts.length ? d.courts.map((c) => {
+    const m = X.playing.find((x) => x.court_id === c.id);
+    if (m) return `<div class="qcourt live"><div class="ch"><h3>${esc(c.name)}</h3><span class="muted num" title="Playing for">${ic("history")} ${qMins(m.started_at)}</span></div>
+      ${m.streak ? `<p class="muted" style="font-size:12.5px">Team A has won ${m.streak} in a row</p>` : ""}${qTeams(m, edit)}
+      ${edit ? `<div class="qwin"><button class="btn" data-a="win" data-m="${m.id}" data-w="A">Team A won</button><button class="btn" data-a="win" data-m="${m.id}" data-w="B" style="background:var(--clay)">Team B won</button></div>
+      <div class="row" style="justify-content:space-between">${sel("mc-" + m.id, d.courts.map((k) => [k.id, k.id === c.id ? "Switch court…" : "Move to " + k.name]), c.id, `data-a="court" data-m="${m.id}" style="width:auto;min-height:36px;font-size:13px"`)}<button class="btn ghost sm" data-a="nogame" data-m="${m.id}">No game</button></div>` : ""}</div>`;
+    const nx = X.upnext.find((x) => x.court_id === c.id) || X.upnext.find((x) => !x.court_id);
+    return `<div class="qcourt"><div class="ch"><h3>${esc(c.name)}</h3><span class="tag" style="background:var(--g1);color:var(--g8)">FREE</span></div>
+      ${nx ? `<p class="muted" style="font-size:13px">Next: ${qNames(nx, "A")} <b>vs</b> ${qNames(nx, "B")}</p>${edit ? `<button class="btn block" data-a="start" data-m="${nx.id}" data-c="${c.id}" ${nx.players.length < 4 ? "disabled" : ""}>Start game on ${esc(c.name)}</button>` : ""}`
+        : `<p class="muted" style="font-size:13px">No game waiting.</p>${edit ? `<button class="btn sec block" data-a="make" data-c="${c.id}" ${X.line.length < 4 ? "disabled" : ""}>Make next game from the line</button>` : ""}`}</div>`;
+  }).join("") : notice("No courts are assigned to this session yet. Choose them on the Open Play page.", "warn");
+
+  const upnext = `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Up next</h2>
+      ${edit ? `<div class="row"><button class="btn sm" data-a="make" ${X.line.length < 4 ? "disabled" : ""}>${ic("plus")} Make next game</button><button class="btn sec sm" data-a="newm">Choose players</button></div>` : ""}</div>
+    ${X.upnext.length ? `<div class="stack">${X.upnext.map((m, i) => `<div class="sub stack" style="gap:10px"><div class="row" style="justify-content:space-between"><div class="row" style="gap:8px"><b>Game ${i + 1}</b>${m.streak ? `<span class="tag lvl">WINNERS STAY</span>` : ""}</div>
+        ${edit ? `<div class="row" style="gap:6px">${sel("uc-" + m.id, courtOpts, m.court_id || "", `data-a="court" data-m="${m.id}" style="width:auto;min-height:36px;font-size:13px"`)}
+          <button class="btn ghost sm" data-a="mv" data-k="match" data-id="${m.id}" data-dir="up" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button><button class="btn ghost sm" data-a="mv" data-k="match" data-id="${m.id}" data-dir="down" aria-label="Move down" ${i === X.upnext.length - 1 ? "disabled" : ""}>↓</button>
+          <button class="btn ghost sm" data-a="cancelm" data-m="${m.id}" aria-label="Remove game">${ic("close")}</button></div>` : `<span class="muted">${esc(d.courts.find((c) => c.id === m.court_id)?.name || "Any court")}</span>`}</div>
+        ${qTeams(m, edit)}
+        ${edit ? `<button class="btn ${m.players.length < 4 ? "sec" : ""}" data-a="start" data-m="${m.id}" ${m.players.length < 4 ? "disabled" : ""}>${m.players.length < 4 ? `Needs ${4 - m.players.length} more player${4 - m.players.length === 1 ? "" : "s"}` : `Start on ${esc(d.courts.find((c) => c.id === m.court_id)?.name || "the next free court")}`}</button>` : ""}</div>`).join("")}</div>`
+      : `<p class="muted">No games lined up. ${X.line.length >= 4 ? "Tap <b>Make next game</b> to take the next 4 from the line." : `A game needs 4 checked-in players waiting (${X.line.length} now).`}</p>`}</div>`;
+
+  const lineRow = (p, i) => `<div class="qrow"><span class="pos">${i + 1}</span><button class="nm linkish" data-a="pl" data-id="${p.id}"><b>${esc(p.name)} ${qStars(p.skill)}</b><small>${qRec(p)} · waiting ${qMins(p.last_played || p.checked_in_at)}${p.source !== "booking" ? ` · ${p.source === "reclub" ? "Reclub" : "walk-in"}` : ""}</small></button>
+    ${edit ? `<button class="btn ghost sm" data-a="mv" data-k="player" data-id="${p.id}" data-dir="up" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button><button class="btn ghost sm" data-a="mv" data-k="player" data-id="${p.id}" data-dir="down" aria-label="Move down" ${i === X.line.length - 1 ? "disabled" : ""}>↓</button><button class="btn sec sm" data-a="st" data-id="${p.id}" data-st="break">Break</button>` : ""}</div>`;
+  const line = `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Waiting line <span class="muted" style="font-family:var(--sans);font-size:14px">${X.line.length}</span></h2></div>
+    ${X.line.length ? `<div class="qline" id="qwait">${X.line.map(lineRow).join("")}</div>` : `<p class="muted">Nobody waiting. Check players in below.</p>`}
+    ${X.rest.length ? `<p class="eyebrow" style="margin:14px 0 6px">On a break</p><div class="qchips">${X.rest.map((p) => `<button class="qchip" data-a="${edit ? "st" : "pl"}" data-id="${p.id}" data-st="here">${esc(p.name)} ${edit ? `<span class="ci">BACK IN</span>` : ""}</button>`).join("")}</div>` : ""}</div>`;
+
+  const f = QV.filter.trim().toLowerCase(), match = (p) => !f || p.name.toLowerCase().includes(f) || (p.reference || "").toLowerCase().includes(f);
+  const groups = {};
+  X.notHere.filter(match).forEach((p) => { const k = p.booking_id ? `${p.booker} · ${p.reference}` : p.source === "reclub" ? "Reclub" : "Walk-in"; (groups[k] ||= []).push(p); });
+  const checkin = `<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Not checked in yet <span class="muted" style="font-family:var(--sans);font-size:14px">${X.notHere.length}</span></h2>
+      ${X.notHere.length > 8 ? `<input class="in" data-a="filt" placeholder="Search name or reference" value="${esc(QV.filter)}" style="width:auto;min-width:220px;min-height:38px">` : ""}</div>
+    <p class="muted" style="font-size:13px;margin-bottom:10px">Names from reserved bookings appear here automatically. Tap a name when the player arrives — they join the back of the line.</p>
+    ${Object.keys(groups).length ? `<div class="stack" style="gap:12px">${Object.entries(groups).map(([k, list]) => `<div><p class="muted" style="font-size:12.5px;font-weight:700;margin-bottom:6px">${esc(k)}</p><div class="qchips">${list.map((p) => `<button class="qchip" data-a="${edit ? "st" : "pl"}" data-id="${p.id}" data-st="here">${esc(p.name)}${p.placeholder ? ` <span class="faint" style="font-size:12px">(no name yet)</span>` : ""} ${edit ? `<span class="ci">CHECK IN</span>` : ""}</button>`).join("")}</div></div>`).join("")}</div>`
+      : `<p class="muted">${X.notHere.length ? "No match." : "Everyone on the list is checked in."}</p>`}
+    ${X.left.length ? `<details style="margin-top:12px"><summary class="muted" style="cursor:pointer;font-size:13px">Left / removed (${X.left.length})</summary><div class="qchips" style="margin-top:8px">${X.left.map((p) => `<button class="qchip" data-a="pl" data-id="${p.id}" style="opacity:.7">${esc(p.name)} <span class="faint" style="font-size:12px">${qRec(p)}</span></button>`).join("")}</div></details>` : ""}</div>`;
+
+  const recent = d.recent.length ? `<div class="card"><h2>Finished games</h2><div class="qline">${d.recent.map((g) => {
+    const W = g.players.filter((p) => p.team === g.winner).map((p) => esc(p.name)).join(" & "), L = g.players.filter((p) => p.team !== g.winner).map((p) => esc(p.name)).join(" & ");
+    return `<div class="qrow"><div class="nm"><b>${W} <span class="muted" style="font-weight:600">beat</span> ${L}</b><small>${esc(g.court || "")} · ${fmtT(g.ended_at)}</small></div>${edit ? `<button class="btn ghost sm" data-a="fixwin" data-m="${g.id}" data-w="${g.winner === "A" ? "B" : "A"}">Change winner</button>` : ""}</div>`; }).join("")}</div></div>` : "";
+
+  const settings = edit ? `<details class="card"><summary style="cursor:pointer;font-weight:800">Rotation for this session</summary>
+    <form class="stack" data-f="qset" style="margin-top:12px">
+      ${field("After each game", sel("mode", [["rotate", "Everyone goes back to the line"], ["winners_stay", "Winners stay on court"]], s.mode))}
+      ${field("Winners can stay for", suffix("win_limit", s.win_limit, "wins", `min="1" max="10"`), "After this many wins in a row, the winners go back to the line too.")}
+      <label class="check"><input type="checkbox" name="autofill" ${s.autofill ? "checked" : ""}> Line up the next game automatically when a court finishes</label>
+      <div><button class="btn sec">Save rotation</button></div></form></details>` : "";
+
+  const stats = `<div class="row" style="gap:8px;margin-bottom:16px">${levelTag(s.level)}<span class="tag">${X.here} checked in</span><span class="tag">${X.line.length} waiting</span><span class="tag">${X.playing.length * 4} playing</span><span class="tag">${X.notHere.length} not here yet</span></div>`;
+  root.innerHTML = `${head}${dateNav(QV.date, base)}${tabs}${over ? notice("This session has ended. You can still look at the games and scores.", "warn") : ""}${stats}
+    <div class="qcourts" style="margin-bottom:16px">${courts}</div>
+    <div class="qgrid"><div class="stack">${upnext}${line}</div><div class="stack">${checkin}${recent}${settings}</div></div>`;
+  const sid = QV.sid;
+  wire(root, {
+    pickdate,
+    sess: (el) => nav(`${base}?d=${QV.date}&s=${el.dataset.id}`),
+    tv: () => { QV.tv = true; qRenderTV(); },
+    add: () => qAddModal(),
+    filt: (el) => { QV.filter = el.value; qRender(); },
+    make: (el) => qAct("queue_make_next", { p_session: sid, p_court: el.dataset.c || null }, "Next game is lined up."),
+    newm: () => qAct("queue_new_match", { p_session: sid, p_court: null }, "Empty game added — tap the spots to choose players."),
+    start: (el) => qAct("queue_start", { p_match: el.dataset.m, p_court: el.dataset.c || null }, "Game started."),
+    win: (el) => qAct("queue_finish", { p_match: el.dataset.m, p_winner: el.dataset.w }, `Team ${el.dataset.w} wins — saved.`),
+    nogame: (el) => { if (confirm("End this game without a winner? The players go back to their places in line.")) qAct("queue_finish", { p_match: el.dataset.m, p_winner: null }, "Game ended — no result."); },
+    court: (el) => qAct("queue_set_court", { p_match: el.dataset.m, p_court: el.value || null }, "Court changed."),
+    cancelm: (el) => qAct("queue_cancel_match", { p_match: el.dataset.m }, "Game removed."),
+    mv: (el) => qAct("queue_move", { p_kind: el.dataset.k, p_id: el.dataset.id, p_dir: el.dataset.dir }),
+    st: (el) => qAct("queue_set_status", { p_player: el.dataset.id, p_status: el.dataset.st }, el.dataset.st === "here" ? "Checked in — added to the line." : el.dataset.st === "break" ? "On a break — keeps their place." : "Saved."),
+    pl: (el) => qPlayerModal(el.dataset.id),
+    slot: (el) => qSlotModal(el.dataset.m, el.dataset.t, Number(el.dataset.s)),
+    fixwin: (el) => { if (confirm("Change the winner of this game? Scores update; the line is not reshuffled.")) qAct("queue_set_winner", { p_match: el.dataset.m, p_winner: el.dataset.w }, "Winner changed."); },
+    qset: (fm, v) => qAct("queue_settings", { p_session: sid, p_mode: v.mode, p_win_limit: Number(v.win_limit), p_autofill: !!v.autofill }, "Rotation saved."),
+  });
+  if (QV.tv) qRenderTV();
+}
+
+function qSlotModal(matchId, team, slot) {
+  const X = qDerive(), m = X.d.matches.find((x) => x.id === matchId); if (!m) return;
+  const cur = m.players.find((p) => p.team === team && p.slot === slot);
+  const where = m.status === "playing" ? (X.d.courts.find((c) => c.id === m.court_id)?.name || "Court") : `Game ${X.upnext.indexOf(m) + 1} (up next)`;
+  const other = X.d.matches.flatMap((g) => g.players.filter((p) => !(g.id === m.id && p.team === team && p.slot === slot)).map((p) => ({ ...p, g })));
+  const label = (g) => g.status === "playing" ? (X.d.courts.find((c) => c.id === g.court_id)?.name || "Court") : `Game ${X.upnext.indexOf(g) + 1}`;
+  let filter = "";
+  openModal({
+    render: () => {
+      const f = filter.toLowerCase(), ok = (n) => !f || n.toLowerCase().includes(f);
+      return `${mhead(cur ? `Replace ${esc(cur.name)}` : "Add a player", `${where} · Team ${team}`)}
+      <input class="in" id="qsf" placeholder="Search name" value="${esc(filter)}" style="margin-bottom:12px">
+      <p class="eyebrow" style="margin-bottom:6px">Waiting line</p>
+      ${X.line.filter((p) => ok(p.name)).map((p, i) => `<button class="qp" style="width:100%;margin-bottom:6px" data-pick="${p.id}"><span>${i + 1}. ${esc(p.name)} ${qStars(p.skill)}</span><span class="muted" style="font-size:12px;font-weight:600">${qRec(p)}</span></button>`).join("") || `<p class="muted" style="margin-bottom:8px">Nobody waiting.</p>`}
+      ${other.filter((p) => ok(p.name)).length ? `<p class="eyebrow" style="margin:12px 0 6px">Switch with a player in another spot</p>${other.filter((p) => ok(p.name)).map((p) => `<button class="qp" style="width:100%;margin-bottom:6px" data-pick="${p.player_id}"><span>${esc(p.name)}</span><span class="muted" style="font-size:12px;font-weight:600">${label(p.g)} · Team ${p.team} ⇄</span></button>`).join("")}` : ""}
+      ${cur ? `<div class="divider"></div><button class="btn ghost" data-pick="">${ic("close")} Empty this spot (${esc(cur.name)} goes back to the line)</button>` : ""}`;
+    },
+    bind: (mo) => {
+      const inp = mo.querySelector("#qsf");
+      inp.addEventListener("input", () => { filter = inp.value; renderModal(); const i2 = $("#qsf"); i2.focus(); i2.setSelectionRange(filter.length, filter.length); });
+      mo.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", async () => {
+        closeModal();
+        await qAct("queue_set_slot", { p_match: matchId, p_team: team, p_slot: slot, p_player: b.dataset.pick || null }, b.dataset.pick ? "Player set." : "Spot emptied.");
+      }));
+    },
+  });
+}
+
+function qPlayerModal(pid) {
+  const X = qDerive(), p = X.byId[pid]; if (!p) return;
+  const edit = X.d.can_edit, ST = { not_here: "Not checked in", here: p.match_id ? (p.match_status === "playing" ? "On court" : "In an upcoming game") : "Waiting in line", break: "On a break", left: "Left" };
+  openModal({
+    center: true,
+    render: () => `${mhead(esc(p.name), ST[p.status])}
+      <dl class="kv" style="margin-bottom:14px"><dt>Games</dt><dd>${qRec(p)}</dd><dt>From</dt><dd>${p.booking_id ? `Booking <a href="#" data-bk="${p.booking_id}">${esc(p.reference)}</a> (${esc(p.booker)})` : p.source === "reclub" ? "Reclub" : "Walk-in"}</dd>
+      ${p.checked_in_at ? `<dt>Checked in</dt><dd>${fmtT(p.checked_in_at)}</dd>` : ""}</dl>
+      ${edit ? `<form class="stack" id="qpf">${field("Name", inp("name", p.name, 'maxlength="100" required'), p.booking_id ? "Also updates the player names on the booking." : "")}
+        ${field("Skill (helps balance the teams)", sel("skill", [["", "Not set"], ["1", "★ Beginner"], ["2", "★★"], ["3", "★★★ Intermediate"], ["4", "★★★★"], ["5", "★★★★★ Advanced"]], p.skill ? String(p.skill) : ""))}
+        <div><button class="btn">Save</button></div></form>
+        <div class="divider"></div>
+        <div class="row">${p.status !== "here" ? `<button class="btn sec sm" data-st="here">${p.status === "not_here" ? "Check in" : "Back in line"}</button>` : ""}
+          ${p.status === "here" && p.match_status !== "playing" ? `<button class="btn sec sm" data-st="break">Break</button>` : ""}
+          ${p.status !== "left" && p.match_status !== "playing" ? `<button class="btn sec sm" data-st="left">Left / went home</button>` : ""}
+          ${p.status !== "not_here" && p.match_status !== "playing" ? `<button class="btn ghost sm" data-st="not_here">Undo check-in</button>` : ""}
+          ${!p.booking_id && p.match_status !== "playing" ? `<button class="btn ghost sm" data-rm style="color:var(--bad)">Remove</button>` : ""}</div>` : ""}`,
+    bind: (mo) => {
+      mo.querySelector("[data-bk]")?.addEventListener("click", (e) => { e.preventDefault(); closeModal(); Staff.openBooking(p.booking_id); });
+      mo.querySelector("#qpf")?.addEventListener("submit", async (e) => {
+        e.preventDefault(); const v = formData(e.target);
+        const r = await qAct("queue_update_player", { p_player: pid, p_name: v.name, p_skill: v.skill ? Number(v.skill) : null }, "Saved.");
+        if (r) closeModal();
+      });
+      mo.querySelectorAll("[data-st]").forEach((b) => b.addEventListener("click", async () => { const r = await qAct("queue_set_status", { p_player: pid, p_status: b.dataset.st }, "Saved."); if (r) closeModal(); }));
+      mo.querySelector("[data-rm]")?.addEventListener("click", async () => { if (!confirm(`Remove ${p.name} from this session's list?`)) return; const r = await qAct("queue_remove_player", { p_player: pid }, "Removed."); if (r) closeModal(); });
+    },
+  });
+}
+
+function qAddModal() {
+  const s = QV.data.session;
+  openModal({
+    center: true,
+    render: () => `${mhead("Add players", `${fmtRange(s.starts_at, s.ends_at)} · ${fmtDate(s.business_date)}`)}
+      <form class="stack" id="qaf">
+        ${field("Names — one per line", `<textarea class="in" name="names" rows="7" placeholder="Paste the Reclub participant list, or type walk-in names" required></textarea>`, "Numbers like “1.” are removed. Names already on the list are skipped. Players who booked here are added automatically — no need to type them.")}
+        ${field("Where are they from?", sel("source", [["reclub", "Reclub"], ["walk_in", "Walk-in"]], "reclub"))}
+        ${field("Skill (optional, for all of them)", sel("skill", [["", "Not set"], ["1", "★"], ["2", "★★"], ["3", "★★★"], ["4", "★★★★"], ["5", "★★★★★"]], ""))}
+        <label class="check"><input type="checkbox" name="here" checked> They're here now — check them in (they join the line)</label>
+        <div><button class="btn">Add to list</button></div></form>`,
+    bind: (mo) => mo.querySelector("#qaf").addEventListener("submit", async (e) => {
+      e.preventDefault(); const v = formData(e.target);
+      const names = String(v.names || "").split(/\r?\n|,(?=\s*\S)/).map((x) => x.trim()).filter(Boolean);
+      const r = await qAct("queue_add_players", { p_session: QV.sid, p_names: names, p_source: v.source, p_here: !!v.here, p_skill: v.skill ? Number(v.skill) : null },
+        (x) => `Added ${x.added}${x.skipped?.length ? ` · skipped ${x.skipped.length} already on the list` : ""}.`);
+      if (r) closeModal();
+    }),
+  });
+}
+
+// Big screen for a TV / tablet facing the players: courts, up next and the line, large type.
+function qRenderTV() {
+  let el = $("#qtv");
+  if (!QV.tv || !QV.data || !location.hash.startsWith("#/staff/queue")) { el?.remove(); QV.tv = false; return; }
+  const X = qDerive(), d = X.d;
+  if (!el) {
+    el = document.createElement("div"); el.id = "qtv"; el.className = "qtv"; document.body.appendChild(el);
+    el.addEventListener("click", (e) => { if (e.target.closest("[data-x]")) { QV.tv = false; el.remove(); if (document.fullscreenElement) document.exitFullscreen?.(); } });
+    el.requestFullscreen?.().catch(() => {});
+  }
+  const team = (m, t) => m.players.filter((p) => p.team === t).map((p) => `<div>${esc(p.name)}</div>`).join("") || "<div>—</div>";
+  el.innerHTML = `<div class="qtv-top"><div class="row" style="gap:14px"><img src="${MONO}" alt="" style="width:54px;filter:brightness(0) invert(1)"><div><b style="font-family:var(--display);font-size:26px">${esc(PUB.business_name)} · Open Play</b><div style="opacity:.75">${fmtRange(d.session.starts_at, d.session.ends_at)}</div></div></div><button class="btn sec" data-x>${ic("close")} Close</button></div>
+    <div class="qtv-courts">${d.courts.map((c) => { const m = X.playing.find((x) => x.court_id === c.id);
+      return `<div class="qtv-court"><div class="qtv-cn">${esc(c.name)}</div>${m ? `<div class="qtv-teams"><div class="qtv-t">${team(m, "A")}</div><div class="qtv-vs">vs</div><div class="qtv-t">${team(m, "B")}</div></div><div style="opacity:.7;margin-top:8px">${qMins(m.started_at)}</div>` : `<div style="font-size:28px;opacity:.7;padding:18px 0">Free</div>`}</div>`; }).join("")}</div>
+    <div class="qtv-low"><div><h2>Up next</h2>${X.upnext.slice(0, 4).map((m, i) => `<div class="qtv-next"><span class="qtv-n">${i + 1}</span><span>${qNames(m, "A")} <i>vs</i> ${qNames(m, "B")}</span>${m.court_id ? `<span style="opacity:.7">${esc(d.courts.find((c) => c.id === m.court_id)?.name || "")}</span>` : ""}</div>`).join("") || `<p style="opacity:.7">—</p>`}</div>
+      <div><h2>In line</h2><ol class="qtv-line">${X.line.slice(0, 16).map((p) => `<li>${esc(p.name)}</li>`).join("") || `<p style="opacity:.7">—</p>`}</ol></div></div>`;
+}
 
 // ---------------------------------------------------------------- All bookings
 Views.bookings = async (root, params) => {
